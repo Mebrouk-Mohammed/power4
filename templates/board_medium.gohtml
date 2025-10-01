@@ -1,0 +1,35 @@
+{{define "board_medium"}}
+<div class="board">
+  <div class="board-inner"
+       style="--rows: {{.Rows}}; --cols: {{.Cols}}; --imgW: 720px;
+              --cell: 52px; --gap: 12px; --pad: 18px;
+              --offx: 110px; --offy: 190px;">
+    <img class="board-img" src="/static/img/medium_difficulty.png" alt="plateau medium">
+
+    <form action="/play" method="post">
+      <div class="controls">
+        {{range $c := rangeN .Cols}}
+          <button class="colbtn" name="col" value="{{$c}}" {{if ne $.Winner 0}}disabled{{end}}>▼</button>
+        {{end}}
+      </div>
+
+      <div class="grid-abs">
+        {{range $i, $row := .Board}}
+          {{range $j, $cell := $row}}
+            <button name="col" value="{{$j}}" type="submit"
+                    style="all:unset;width:var(--cell);height:var(--cell);border-radius:50%;
+                           display:block;position:relative;cursor:pointer;"
+                    {{if ne $.Winner 0}}disabled{{end}}>
+              {{if eq $cell 1}}
+                {{template "token_p1" $}}
+              {{else if eq $cell 2}}
+                {{template "token_p2" $}}
+              {{end}}
+            </button>
+          {{end}}
+        {{end}}
+      </div>
+    </form>
+  </div>
+</div>
+{{end}}
