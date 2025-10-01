@@ -178,7 +178,7 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
     }
     .board {
       display: inline-block;
-      background-image: url('/assets/plateau.png');
+      background-image: url('/assets/picture/plateau-facile.png');
       background-size: cover;
       background-repeat: no-repeat;
       width: 490px;
@@ -201,11 +201,11 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
       border-radius: 50%;
     }
     .token-orange {
-      background-image: url('/assets/jeton-orange.png');
+      background-image: url('/assets/picture/jeton-orange.png');
       background-size: cover;
     }
     .token-mauve {
-      background-image: url('/assets/jeton-mauve.png');
+      background-image: url('/assets/picture/jeton-mauve.png');
       background-size: cover;
     }
     .message {
@@ -353,6 +353,17 @@ func webGameHandler(w http.ResponseWriter, r *http.Request) {
       margin-bottom: 20px;
       color: #333;
     }
+    .plateau-preview {
+      width: 300px;
+      height: 250px;
+      background-image: url('/assets/picture/plateau-facile.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
     a {
       display: inline-block;
       margin: 10px;
@@ -372,6 +383,8 @@ func webGameHandler(w http.ResponseWriter, r *http.Request) {
 <body>
   <div class="container">
     <h1>Bienvenue sur notre Puissance 4 en ligne !</h1>
+    <div class="plateau-preview"></div>
+    <p>Alignez 4 jetons de votre couleur pour gagner !</p>
     <a href="/game">Lancer une partie</a>
   </div>
 </html>`
@@ -389,8 +402,8 @@ func main() {
 	// 🎮 PAGE DE JEU AVEC PLATEAU ET JETONS
 	http.HandleFunc("/game", gameHandler)
 
-	// 🖼️ SERVIR VOS IMAGES DEPUIS LE DOSSIER CSS/pictures/
-	http.Handle("/CSS/", http.StripPrefix("/CSS/", http.FileServer(http.Dir("./CSS/pictures/"))))
+	// 🖼️ SERVIR VOS IMAGES DEPUIS LE DOSSIER assets/
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../../assets/"))))
 
 	// APIs du jeu
 	http.HandleFunc("/api/state", stateHandler)
@@ -399,7 +412,7 @@ func main() {
 
 	fmt.Println("🎮 Serveur Puissance 4 démarré sur http://localhost:8080")
 	fmt.Println("📱 Ouvrez votre navigateur à cette adresse pour jouer !")
-	fmt.Println("🖼️ Images servies depuis : ./CSS/pictures/jeton-mauve")
+	fmt.Println("🖼️ Images servies depuis : ../../assets/picture/")
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
