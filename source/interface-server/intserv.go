@@ -196,8 +196,8 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
       justify-content: center;
     }
     .token {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
     }
     .token-orange {
@@ -263,8 +263,8 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
         for (let col = 0; col < 7; col++) {
           const cell = document.createElement('div');
           cell.className = 'cell';
-          cell.style.left = (25 + col * 70) + 'px';
-          cell.style.top = (25 + row * 70) + 'px';
+          cell.style.left = (55 + col * 62) + 'px';
+          cell.style.top = (65 + row * 58) + 'px';
           cell.onclick = () => dropToken(col);
           
           if (gameState && gameState.cells[row][col] !== 0) {
@@ -412,7 +412,7 @@ func main() {
 
 	fmt.Println("🎮 Serveur Puissance 4 démarré sur http://localhost:8080")
 	fmt.Println("📱 Ouvrez votre navigateur à cette adresse pour jouer !")
-	fmt.Println("🖼️ Images servies depuis : ../../assets/picture/")
+	fmt.Println("🖼️ Images servies depuis : ./assets/picture/")
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
