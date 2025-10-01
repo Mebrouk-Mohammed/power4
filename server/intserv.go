@@ -389,8 +389,8 @@ func main() {
 	// 🎮 PAGE DE JEU AVEC PLATEAU ET JETONS
 	http.HandleFunc("/game", gameHandler)
 
-	// 🖼️ SERVIR VOS IMAGES DEPUIS LE DOSSIER interface/assets/
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./interface/assets/"))))
+	// 🖼️ SERVIR VOS IMAGES DEPUIS LE DOSSIER CSS/pictures/
+	http.Handle("/CSS/", http.StripPrefix("/CSS/", http.FileServer(http.Dir("./CSS/pictures/"))))
 
 	// APIs du jeu
 	http.HandleFunc("/api/state", stateHandler)
@@ -399,7 +399,7 @@ func main() {
 
 	fmt.Println("🎮 Serveur Puissance 4 démarré sur http://localhost:8080")
 	fmt.Println("📱 Ouvrez votre navigateur à cette adresse pour jouer !")
-	fmt.Println("🖼️ Images servies depuis : ./interface/assets/jeton-mauve")
+	fmt.Println("🖼️ Images servies depuis : ./CSS/pictures/jeton-mauve")
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
