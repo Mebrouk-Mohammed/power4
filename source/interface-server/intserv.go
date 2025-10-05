@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	// Constantes du jeu
 	Rows    = 6
 	Columns = 7
 	Empty   = 0
@@ -16,6 +17,7 @@ const (
 )
 
 type Board struct {
+	// Représente le plateau de jeu
 	Cells         [Rows][Columns]int `json:"cells"`
 	CurrentPlayer int                `json:"currentPlayer"`
 	Winner        int                `json:"winner"`
@@ -26,6 +28,7 @@ type Board struct {
 var gameBoard Board
 
 func (b *Board) Reset() {
+	// Réinitialise le plateau de jeu
 	for r := 0; r < Rows; r++ {
 		for c := 0; c < Columns; c++ {
 			b.Cells[r][c] = Empty
@@ -38,11 +41,13 @@ func (b *Board) Reset() {
 }
 
 func (b *Board) Drop(col int) (int, bool) {
+	// Place un jeton dans la colonne spécifiée
 	if b.GameOver {
 		return -1, false
 	}
 
 	for r := Rows - 1; r >= 0; r-- {
+		// Cherche la première case vide
 		if b.Cells[r][col] == Empty {
 			b.Cells[r][col] = b.CurrentPlayer
 
@@ -177,6 +182,11 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
       text-align: center;
     }
     .board {
+      --cell: 52px; 
+      --gap: 11px; 
+      --pad: 18px;
+      --offx: 20px; 
+      --offy: 40px;
       display: inline-block;
       background-image: url('/assets/picture/plateau-facile.png');
       background-size: cover;
@@ -188,25 +198,29 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
     }
     .cell {
       position: absolute;
-      width: 60px;
-      height: 60px;
+      width: 58px;
+      height: 58px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .token {
-      width: 45px;
-      height: 45px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
     }
     .token-orange {
       background-image: url('/assets/picture/jeton-orange.png');
       background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
     .token-mauve {
       background-image: url('/assets/picture/jeton-mauve.png');
       background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
     .message {
       font-size: 18px;
@@ -263,8 +277,8 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
         for (let col = 0; col < 7; col++) {
           const cell = document.createElement('div');
           cell.className = 'cell';
-          cell.style.left = (55 + col * 62) + 'px';
-          cell.style.top = (65 + row * 58) + 'px';
+          cell.style.left = (35 + col * 64) + 'px';
+          cell.style.top = (45 + row * 62) + 'px';
           cell.onclick = () => dropToken(col);
           
           if (gameState && gameState.cells[row][col] !== 0) {
@@ -396,13 +410,13 @@ func main() {
 	// Initialiser le jeu
 	gameBoard.Reset()
 
-	// 🌐 PAGE PRINCIPALE AVEC VOS IMAGES
+	// PAGE PRINCIPALE AVEC VOS IMAGES
 	http.HandleFunc("/", webGameHandler)
 
-	// 🎮 PAGE DE JEU AVEC PLATEAU ET JETONS
+	// PAGE DE JEU AVEC PLATEAU ET JETONS
 	http.HandleFunc("/game", gameHandler)
 
-	// 🖼️ SERVIR VOS IMAGES DEPUIS LE DOSSIER assets/
+	//  SERVIR VOS IMAGES DEPUIS LE DOSSIER assets/
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../../assets/"))))
 
 	// APIs du jeu
