@@ -9,15 +9,15 @@ import (
 	"sync"
 	"time"
 
+	"power4/auth"
 	"power4/game"
 )
 
-// Server : état partagé (jeu) + templates + config d'affichage
 type Server struct {
 	mu        sync.Mutex
 	g         *game.Game
 	tpls      *template.Template
-	boardTmpl string // "board_small" | "board_medium" | "board_large"
+	boardTmpl string
 }
 
 func NewDefault() *Server {
@@ -40,6 +40,7 @@ func NewDefault() *Server {
 		"templates/board_large.gohtml",
 		"templates/token_p1.gohtml",
 		"templates/token_p2.gohtml",
+		"templates/auth_menu.gohtml", // menu Auth
 	))
 
 	// Démarrage : Medium/Normal (6x9 + 5 blocs)
@@ -55,17 +56,23 @@ func NewDefault() *Server {
 func (s *Server) Listen(addr string) error {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// protège toutes les routes d'un panic
-	http.HandleFunc("/", s.safe(s.handleIndex))
+	// Auth / Accueil
+	http.HandleFunc("/", s.safe(s.handleAuthMenu)) // ⬅️ page d'accueil = menu compte
+	http.HandleFunc("/auth", s.safe(s.handleAuthMenu))
+	http.HandleFunc("/login", auth.LoginHandler)
+	http.HandleFunc("/register", auth.RegisterHandler)
+
+	// Jeu
+	http.HandleFunc("/game", s.safe(s.handleIndex)) // ⬅️ le jeu est ici maintenant
 	http.HandleFunc("/play", s.safe(s.handlePlay))
 	http.HandleFunc("/reset", s.safe(s.handleReset))
-	http.HandleFunc("/new", s.safe(s.handleNew)) // /new?size=small|medium|large
+	http.HandleFunc("/new", s.safe(s.handleNew))
 
 	log.Printf("Power4 Web → http://localhost%s\n", addr)
 	return http.ListenAndServe(addr, nil)
 }
 
-// safe empêche un panic d'arrêter le serveur et renvoie 500 proprement.
+// empêche un panic d'arrêter le serveur
 func (s *Server) safe(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
@@ -84,10 +91,12 @@ type viewData struct {
 	CurrentPlayer int
 	Winner        int
 	BoardTemplate string
-	Debug         bool // ← pour le mode debug d’alignement
+	Debug         bool // utilisé par layout.gohtml
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	dbg := r.URL.Query().Get("debug") == "1"
+
 	s.mu.Lock()
 	v := viewData{
 		Board:         s.g.Board,
@@ -96,11 +105,9 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		CurrentPlayer: s.g.CurrentPlayer,
 		Winner:        s.g.Winner,
 		BoardTemplate: s.boardTmpl,
+		Debug:         dbg,
 	}
 	s.mu.Unlock()
-
-	// active le mode debug si /?debug=1
-	v.Debug = (r.URL.Query().Get("debug") == "1")
 
 	if err := s.tpls.ExecuteTemplate(w, "layout", v); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -109,7 +116,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handlePlay(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/game", http.StatusSeeOther)
 		return
 	}
 	if err := r.ParseForm(); err != nil {
@@ -123,17 +130,22 @@ func (s *Server) handlePlay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.mu.Lock()
-	_ = s.g.Drop(col) // ignore si colonne pleine/terminée
+	_ = s.g.Drop(col)
 	s.mu.Unlock()
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	if r.URL.Query().Get("debug") == "1" {
+		http.Redirect(w, r, "/game?debug=1", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, "/game", http.StatusSeeOther)
 }
 
 func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
+	dbg := r.URL.Query().Get("debug") == "1"
+
 	s.mu.Lock()
 	rows, cols := s.g.Rows, s.g.Cols
 	s.g.Reset(rows, cols)
-	// remettre des blocs selon le plateau courant
 	switch s.boardTmpl {
 	case "board_small":
 		s.g.ApplyBlocked(genBlocked(rows, cols, 3))
@@ -143,30 +155,28 @@ func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 		s.g.ApplyBlocked(genBlocked(rows, cols, 5))
 	}
 	s.mu.Unlock()
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	if dbg {
+		http.Redirect(w, r, "/game?debug=1", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, "/game", http.StatusSeeOther)
 }
 
-// /new?size=small|medium|large
+// /new?size=small|medium|large[&debug=1]
 func (s *Server) handleNew(w http.ResponseWriter, r *http.Request) {
 	size := r.URL.Query().Get("size")
-	log.Println("Switch difficulty →", size)
+	dbg := r.URL.Query().Get("debug") == "1"
 
 	var rows, cols, nbBlocked int
 	var tmpl string
-
 	switch size {
-	case "small": // Easy : 6x7, 3 cases bloquées
-		rows, cols = 6, 7
-		nbBlocked = 3
-		tmpl = "board_small"
-	case "large": // Hard : 7x8, 7 cases bloquées
-		rows, cols = 7, 8
-		nbBlocked = 7
-		tmpl = "board_large"
-	default: // Medium/Normal : 6x9, 5 cases bloquées
-		rows, cols = 6, 9
-		nbBlocked = 5
-		tmpl = "board_medium"
+	case "small": // Easy
+		rows, cols, nbBlocked, tmpl = 6, 7, 3, "board_small"
+	case "large": // Hard
+		rows, cols, nbBlocked, tmpl = 7, 8, 7, "board_large"
+	default: // Medium/Normal
+		rows, cols, nbBlocked, tmpl = 6, 9, 5, "board_medium"
 	}
 
 	s.mu.Lock()
@@ -175,12 +185,21 @@ func (s *Server) handleNew(w http.ResponseWriter, r *http.Request) {
 	s.boardTmpl = tmpl
 	s.mu.Unlock()
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	if dbg {
+		http.Redirect(w, r, "/game?debug=1", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, "/game", http.StatusSeeOther)
 }
 
-// ----------------- utilitaires -----------------
+// Menu Auth
+func (s *Server) handleAuthMenu(w http.ResponseWriter, r *http.Request) {
+	if err := s.tpls.ExecuteTemplate(w, "auth_menu", nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
 
-// genBlocked choisit 'n' cases à bloquer aléatoirement
+// utils
 func genBlocked(rows, cols, n int) []game.Position {
 	if n <= 0 {
 		return nil
@@ -192,7 +211,7 @@ func genBlocked(rows, cols, n int) []game.Position {
 		n = max
 	}
 	for len(out) < n {
-		k := rand.Intn(max) // 0..rows*cols-1
+		k := rand.Intn(max)
 		if _, ok := seen[k]; ok {
 			continue
 		}

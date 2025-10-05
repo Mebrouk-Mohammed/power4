@@ -62,7 +62,9 @@
       {{else}} 🎉 Joueur <strong>{{.Winner}}</strong> gagne !
       {{end}}
 
-      <a class="link" href="/reset">Réinitialiser</a>
+      <a class="link" href="{{if .Debug}}/reset?debug=1{{else}}/reset{{end}}">Réinitialiser</a>
+      <a class="link" href="/auth">Compte</a>
+
       {{if .Debug}}
         <a class="link" href="/">Masquer l’aide</a>
       {{else}}
@@ -70,6 +72,7 @@
       {{end}}
 
       <form action="/new" method="get" class="sizes">
+        {{if .Debug}}<input type="hidden" name="debug" value="1">{{end}}
         <button class="colbtn" type="submit" name="size" value="small">Small</button>
         <button class="colbtn" type="submit" name="size" value="medium">Medium</button>
         <button class="colbtn" type="submit" name="size" value="large">Large</button>
