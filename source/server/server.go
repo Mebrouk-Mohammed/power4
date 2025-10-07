@@ -18,22 +18,24 @@ type Server struct {
 	g         *game.Game
 	tpls      *template.Template
 	boardTmpl string // "board_small" | "board_medium" | "board_large"
+	autoPlayActive bool // true si le jeton auto est en cours
 }
 
+// NewDefault initialise le serveur avec le plateau medium
 func NewDefault() *Server {
 	rand.Seed(time.Now().UnixNano())
 
-	fm := template.FuncMap{
+	funcs := template.FuncMap{
 		"rangeN": func(n int) []int {
 			out := make([]int, n)
-			for i := 0; i < n; i++ {
+			for i := range out {
 				out[i] = i
 			}
 			return out
 		},
 	}
 
-	tpls := template.Must(template.New("").Funcs(fm).ParseFiles(
+	tpls := template.Must(template.New("").Funcs(funcs).ParseFiles(
 		"templates/layout.gohtml",
 		"templates/board_small.gohtml",
 		"templates/board_medium.gohtml",
@@ -42,98 +44,136 @@ func NewDefault() *Server {
 		"templates/token_p2.gohtml",
 	))
 
-	// Démarrage : Medium/Normal (6x9 + 5 blocs)
 	s := &Server{
 		g:         game.New(6, 9),
 		tpls:      tpls,
 		boardTmpl: "board_medium",
+		autoPlayActive: false,
 	}
 	s.g.ApplyBlocked(genBlocked(6, 9, 5))
 	return s
 }
 
+// Listen démarre le serveur HTTP
 func (s *Server) Listen(addr string) error {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// protège toutes les routes d'un panic
 	http.HandleFunc("/", s.safe(s.handleIndex))
 	http.HandleFunc("/play", s.safe(s.handlePlay))
 	http.HandleFunc("/reset", s.safe(s.handleReset))
-	http.HandleFunc("/new", s.safe(s.handleNew)) // /new?size=small|medium|large
+	http.HandleFunc("/new", s.safe(s.handleNew))
 
-	log.Printf("Power4 Web → http://localhost%s\n", addr)
+	log.Printf("✅ Serveur Power4 lancé sur http://localhost%s\n", addr)
 	return http.ListenAndServe(addr, nil)
 }
 
-// safe empêche un panic d'arrêter le serveur et renvoie 500 proprement.
+// safe protège les handlers contre les panic
 func (s *Server) safe(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if rec := recover(); rec != nil {
-				log.Println("PANIC:", rec)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Println("🔥 PANIC:", rec)
+				http.Error(w, "Erreur interne du serveur", http.StatusInternalServerError)
 			}
 		}()
 		h(w, r)
 	}
 }
 
+// viewData : données passées au template
 type viewData struct {
-	Board         [][]int
-	Rows, Cols    int
-	CurrentPlayer int
-	Winner        int
-	BoardTemplate string
-	Debug         bool // ← pour le mode debug d’alignement
+	   Board         [][]int
+	   Rows, Cols    int
+	   CurrentPlayer int
+	   Winner        int
+	   BoardTemplate string
+	   Debug         bool
+	   AutoPlayActive bool
 }
 
+// handleIndex : page principale du jeu
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
-	v := viewData{
-		Board:         s.g.Board,
-		Rows:          s.g.Rows,
-		Cols:          s.g.Cols,
-		CurrentPlayer: s.g.CurrentPlayer,
-		Winner:        s.g.Winner,
-		BoardTemplate: s.boardTmpl,
-	}
+	   v := viewData{
+		   Board:         s.g.Board,
+		   Rows:          s.g.Rows,
+		   Cols:          s.g.Cols,
+		   CurrentPlayer: s.g.CurrentPlayer,
+		   Winner:        s.g.Winner,
+		   BoardTemplate: s.boardTmpl,
+		   Debug:         r.URL.Query().Get("debug") == "1",
+		   AutoPlayActive: s.autoPlayActive,
+	   }
 	s.mu.Unlock()
-
-	// active le mode debug si /?debug=1
-	v.Debug = (r.URL.Query().Get("debug") == "1")
 
 	if err := s.tpls.ExecuteTemplate(w, "layout", v); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
+// handlePlay : joue un coup
 func (s *Server) handlePlay(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "invalid form", http.StatusBadRequest)
-		return
-	}
-	col, err := strconv.Atoi(r.Form.Get("col"))
-	if err != nil {
-		http.Error(w, "invalid col", http.StatusBadRequest)
-		return
-	}
+   if r.Method != http.MethodPost {
+	   http.Redirect(w, r, "/", http.StatusSeeOther)
+	   return
+   }
+   if err := r.ParseForm(); err != nil {
+	   http.Error(w, "Formulaire invalide", http.StatusBadRequest)
+	   return
+   }
 
-	s.mu.Lock()
-	_ = s.g.Drop(col) // ignore si colonne pleine/terminée
-	s.mu.Unlock()
+   colStr := r.Form.Get("col")
+   var col int
+   var err error
+   if colStr != "" {
+	   col, err = strconv.Atoi(colStr)
+	   if err != nil {
+		   http.Error(w, "Colonne invalide", http.StatusBadRequest)
+		   return
+	   }
+   } else {
+	   // Si aucune colonne n'est fournie, attendre 10 secondes puis jouer automatiquement
+	   timer := time.NewTimer(10 * time.Second)
+	   played := make(chan bool, 1)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	   go func() {
+		   <-timer.C
+		   s.mu.Lock()
+		   // Cherche les colonnes valides
+		   validCols := []int{}
+		   for c := 0; c < s.g.Cols; c++ {
+			   for r := s.g.Rows - 1; r >= 0; r-- {
+				   if s.g.Board[r][c] == 0 {
+					   validCols = append(validCols, c)
+					   break
+				   }
+			   }
+		   }
+		   if len(validCols) > 0 {
+			   randCol := validCols[rand.Intn(len(validCols))]
+			   _ = s.g.Drop(randCol)
+		   }
+		   s.mu.Unlock()
+		   played <- true
+	   }()
+
+	   <-played
+	   http.Redirect(w, r, "/", http.StatusSeeOther)
+	   return
+   }
+
+   s.mu.Lock()
+   _ = s.g.Drop(col)
+   s.mu.Unlock()
+
+   http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// handleReset : réinitialise la partie
 func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
 	rows, cols := s.g.Rows, s.g.Cols
 	s.g.Reset(rows, cols)
-	// remettre des blocs selon le plateau courant
 	switch s.boardTmpl {
 	case "board_small":
 		s.g.ApplyBlocked(genBlocked(rows, cols, 3))
@@ -146,24 +186,24 @@ func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// /new?size=small|medium|large
+// handleNew : change la taille du plateau
 func (s *Server) handleNew(w http.ResponseWriter, r *http.Request) {
 	size := r.URL.Query().Get("size")
-	log.Println("Switch difficulty →", size)
+	log.Println("🔁 Changement de difficulté →", size)
 
 	var rows, cols, nbBlocked int
 	var tmpl string
 
 	switch size {
-	case "small": // Easy : 6x7, 3 cases bloquées
+	case "small":
 		rows, cols = 6, 7
 		nbBlocked = 3
 		tmpl = "board_small"
-	case "large": // Hard : 7x8, 7 cases bloquées
+	case "large":
 		rows, cols = 7, 8
 		nbBlocked = 7
 		tmpl = "board_large"
-	default: // Medium/Normal : 6x9, 5 cases bloquées
+	default:
 		rows, cols = 6, 9
 		nbBlocked = 5
 		tmpl = "board_medium"
@@ -178,9 +218,7 @@ func (s *Server) handleNew(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// ----------------- utilitaires -----------------
-
-// genBlocked choisit 'n' cases à bloquer aléatoirement
+// genBlocked : génère n cases bloquées aléatoires
 func genBlocked(rows, cols, n int) []game.Position {
 	if n <= 0 {
 		return nil
@@ -192,7 +230,7 @@ func genBlocked(rows, cols, n int) []game.Position {
 		n = max
 	}
 	for len(out) < n {
-		k := rand.Intn(max) // 0..rows*cols-1
+		k := rand.Intn(max)
 		if _, ok := seen[k]; ok {
 			continue
 		}

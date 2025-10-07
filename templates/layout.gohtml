@@ -1,65 +1,147 @@
 {{define "layout"}}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Power4</title>
+  <title>Puissance 4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { --cell: 64px; --gap: 12px; --pad: 18px; --offx: 0px; --offy: 0px; --imgW: 720px; }
+    :root {
+      --cell: 64px;
+      --gap: 12px;
+      --pad: 18px;
+      --offx: 0px;
+      --offy: 0px;
+      --imgW: 720px;
+    }
 
-    body{font-family:system-ui;background:#0b1020;color:#f1faee;margin:0}
-    .wrap{max-width:1100px;margin:40px auto;padding:16px}
+    body {
+      font-family: system-ui;
+      background: #0b1020;
+      color: #f1faee;
+      margin: 0;
+    }
 
-    .status{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-    .link{color:#a8dadc}
+    .wrap {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 16px;
+    }
 
-    .sizes{display:flex;gap:8px;margin-left:8px}
-    .colbtn{padding:8px;border-radius:8px;border:1px solid #2d3f70;background:#152348;color:#a8dadc;font-weight:600;cursor:pointer}
-    .colbtn:disabled{opacity:.6;cursor:not-allowed}
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
 
-    .board{background:#10223f;padding:16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-    .board-inner{
-      position:relative;
+    .link {
+      color: #a8dadc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .sizes {
+      display: flex;
+      gap: 8px;
+      margin-left: 8px;
+    }
+
+    .colbtn {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #2d3f70;
+      background: #152348;
+      color: #a8dadc;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .colbtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .board {
+      background: #10223f;
+      padding: 16px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .board-inner {
+      position: relative;
       padding: var(--pad);
-      border-radius:12px;
+      border-radius: 12px;
       width: fit-content;
       margin: 0 auto;
       overflow: hidden;
     }
-    .board-img{display:block;width:var(--imgW);height:auto;user-select:none;pointer-events:none}
 
-    .grid-abs{
-      position:absolute;
+    .board-img {
+      display: block;
+      width: var(--imgW);
+      height: auto;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .grid-abs {
+      position: absolute;
       top: var(--offy);
       left: var(--offx);
-      display:grid;
+      display: grid;
       grid-template-columns: repeat(var(--cols), var(--cell));
       grid-template-rows: repeat(var(--rows), var(--cell));
       gap: var(--gap);
-      width: calc(var(--cols)*var(--cell) + (var(--cols) - 1)*var(--gap));
-      height: calc(var(--rows)*var(--cell) + (var(--rows) - 1)*var(--gap));
+      width: calc(var(--cols) * var(--cell) + (var(--cols) - 1) * var(--gap));
+      height: calc(var(--rows) * var(--cell) + (var(--rows) - 1) * var(--gap));
     }
 
-    .token{width:var(--cell);height:var(--cell);border-radius:50%;background-position:center;background-size:cover;
-           box-shadow:0 0 10px rgba(0,0,0,.35), inset 0 6px 10px rgba(0,0,0,.35)}
+    .token {
+      width: var(--cell);
+      height: var(--cell);
+      border-radius: 50%;
+      background-position: center;
+      background-size: cover;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.35), inset 0 6px 10px rgba(0, 0, 0, 0.35);
+    }
 
-    .controls{display:grid;grid-template-columns:repeat({{.Cols}},1fr);gap:10px;margin:14px 0 22px}
+    .controls {
+      display: grid;
+      grid-template-columns: repeat({{.Cols}}, 1fr);
+      gap: 10px;
+      margin: 14px 0 22px;
+    }
 
-    /* Mode debug : visualiser les cellules pour caler au pixel */
-    .debug .grid-abs button{
-      outline:1px dashed rgba(255,255,255,.35);
-      background:rgba(255,255,255,.06);
-      border-radius:50%;
+    .grid-btn {
+      all: unset;
+      width: var(--cell);
+      height: var(--cell);
+      border-radius: 50%;
+      display: block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .debug .grid-abs button {
+      outline: 1px dashed rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
     }
   </style>
 </head>
 <body class="{{if .Debug}}debug{{end}}">
   <div class="wrap">
     <div class="status">
-      {{if eq .Winner 0}} Tour du joueur <strong>{{.CurrentPlayer}}</strong>
-      {{else if eq .Winner -1}} <strong>Égalité</strong>
-      {{else}} 🎉 Joueur <strong>{{.Winner}}</strong> gagne !
+      {{if eq .Winner 0}}
+        Tour du joueur <strong>{{.CurrentPlayer}}</strong>
+        <!-- Timer déplacé dans les templates de plateau -->
+      {{else if eq .Winner -1}}
+        <strong>Égalité</strong>
+      {{else}}
+        🎉 Joueur <strong>{{.Winner}}</strong> gagne !
       {{end}}
 
       <a class="link" href="/reset">Réinitialiser</a>
