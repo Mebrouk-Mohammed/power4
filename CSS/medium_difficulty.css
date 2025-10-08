@@ -1,0 +1,175 @@
+/* Container principal */
+.connect4-container {
+  background: linear-gradient(135deg, #0f1b3c 0%, #1a2951 50%, #0a1429 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Plateau principal */
+.board-neon {
+  position: relative;
+  background: transparent;
+  padding: 0;
+}
+
+/* Cadre extérieur avec effet néon */
+.board-frame {
+  background: rgba(5, 15, 40, 0.9);
+  border: 3px solid #00aaff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 
+    0 0 20px rgba(0, 170, 255, 0.4),
+    0 0 40px rgba(0, 170, 255, 0.2),
+    inset 0 0 20px rgba(0, 50, 100, 0.3);
+  position: relative;
+}
+
+.board-frame::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #00aaff, #0088dd, #00aaff);
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0.6;
+  filter: blur(2px);
+}
+
+/* Grille des trous */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 6px;
+  background: rgba(10, 25, 55, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid rgba(0, 170, 255, 0.6);
+}
+
+/* Cercles/trous individuels */
+.hole {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 100, 200, 0.1), rgba(5, 15, 40, 0.9));
+  border: 2px solid #00aaff;
+  box-shadow: 
+    0 0 10px rgba(0, 170, 255, 0.3),
+    inset 0 0 10px rgba(0, 50, 150, 0.4),
+    inset 0 2px 5px rgba(0, 170, 255, 0.2);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Effet de profondeur pour les trous */
+.hole::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, transparent 30%, rgba(0, 50, 120, 0.3) 70%);
+  border: 1px solid rgba(0, 170, 255, 0.2);
+}
+
+.hole::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Effet hover sur les trous */
+.hole:hover {
+  box-shadow: 
+    0 0 15px rgba(0, 170, 255, 0.5),
+    inset 0 0 15px rgba(0, 100, 255, 0.3);
+  border-color: #00ccff;
+  transform: scale(1.02);
+}
+
+/* Base du plateau */
+.board-base {
+  width: 100%;
+  height: 35px;
+  background: linear-gradient(to bottom, 
+    rgba(0, 170, 255, 0.8) 0%, 
+    rgba(0, 120, 200, 0.9) 50%, 
+    rgba(0, 80, 150, 1) 100%);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 
+    0 4px 12px rgba(0, 170, 255, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  border: 2px solid #00aaff;
+  border-top: none;
+  position: relative;
+}
+
+.board-base::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* Pieds du plateau */
+.board-feet {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+  margin-top: -5px;
+}
+
+.foot {
+  width: 40px;
+  height: 20px;
+  background: linear-gradient(to bottom, rgba(0, 120, 200, 0.9), rgba(0, 80, 150, 1));
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0, 170, 255, 0.3);
+  border: 1px solid #00aaff;
+  border-top: none;
+}
+
+/* Effets de lumière ambiante */
+body {
+  background: radial-gradient(ellipse at center, #1a2951 0%, #0f1b3c 40%, #0a1429 100%);
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Animation de pulsation optionnelle */
+@keyframes neon-glow {
+  0%, 100% { 
+    box-shadow: 
+      0 0 20px rgba(0, 170, 255, 0.4),
+      0 0 40px rgba(0, 170, 255, 0.2);
+  }
+  50% { 
+    box-shadow: 
+      0 0 30px rgba(0, 170, 255, 0.6),
+      0 0 60px rgba(0, 170, 255, 0.3);
+  }
+}
+
+.board-frame.animate {
+  animation: neon-glow 3s ease-in-out infinite;
+}
