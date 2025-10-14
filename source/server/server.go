@@ -12,6 +12,16 @@ import (
 	"power4/game"
 )
 
+type viewData struct {
+	Board           [][]int
+	Rows, Cols      int
+	CurrentPlayer   int
+	Winner          int
+	BoardTemplate   string
+	Debug           bool // ← pour le mode debug d'alignement
+	InvertedGravity bool // ← pour le mode gravité inversée
+}
+
 // Server : état partagé (jeu) + templates + config d'affichage
 type Server struct {
 	mu        sync.Mutex
@@ -42,31 +52,29 @@ func NewDefault() *Server {
 		"templates/token_p2.gohtml",
 	))
 
-	// Démarrage : Medium/Normal (6x9 + 5 blocs)
-	s := &Server{
-		g:         game.New(6, 9),
+	g := game.New(6, 9) // medium par défaut
+	g.ApplyBlocked(genBlocked(6, 9, 5))
+
+	return &Server{
+		g:         g,
 		tpls:      tpls,
 		boardTmpl: "board_medium",
 	}
-	s.g.ApplyBlocked(genBlocked(6, 9, 5))
-	return s
 }
 
 func (s *Server) Listen(addr string) error {
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", safe(s.handleIndex))
+	mux.HandleFunc("/play", safe(s.handlePlay))
+	mux.HandleFunc("/reset", safe(s.handleReset))
+	mux.HandleFunc("/new", safe(s.handleNew))
+	mux.HandleFunc("/gravity", safe(s.handleGravity))
 
-	// protège toutes les routes d'un panic
-	http.HandleFunc("/", s.safe(s.handleIndex))
-	http.HandleFunc("/play", s.safe(s.handlePlay))
-	http.HandleFunc("/reset", s.safe(s.handleReset))
-	http.HandleFunc("/new", s.safe(s.handleNew)) // /new?size=small|medium|large
-
-	log.Printf("Power4 Web → http://localhost%s\n", addr)
-	return http.ListenAndServe(addr, nil)
+	log.Printf("Server listening on %s", addr)
+	return http.ListenAndServe(addr, mux)
 }
 
-// safe empêche un panic d'arrêter le serveur et renvoie 500 proprement.
-func (s *Server) safe(h http.HandlerFunc) http.HandlerFunc {
+func safe(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if rec := recover(); rec != nil {
@@ -78,24 +86,16 @@ func (s *Server) safe(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-type viewData struct {
-	Board         [][]int
-	Rows, Cols    int
-	CurrentPlayer int
-	Winner        int
-	BoardTemplate string
-	Debug         bool // ← pour le mode debug d’alignement
-}
-
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
 	v := viewData{
-		Board:         s.g.Board,
-		Rows:          s.g.Rows,
-		Cols:          s.g.Cols,
-		CurrentPlayer: s.g.CurrentPlayer,
-		Winner:        s.g.Winner,
-		BoardTemplate: s.boardTmpl,
+		Board:           s.g.Board,
+		Rows:            s.g.Rows,
+		Cols:            s.g.Cols,
+		CurrentPlayer:   s.g.CurrentPlayer,
+		Winner:          s.g.Winner,
+		BoardTemplate:   s.boardTmpl,
+		InvertedGravity: s.g.InvertedGravity,
 	}
 	s.mu.Unlock()
 
@@ -178,8 +178,6 @@ func (s *Server) handleNew(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// ----------------- utilitaires -----------------
-
 // genBlocked choisit 'n' cases à bloquer aléatoirement
 func genBlocked(rows, cols, n int) []game.Position {
 	if n <= 0 {
@@ -202,4 +200,19 @@ func genBlocked(rows, cols, n int) []game.Position {
 		out = append(out, game.Position{R: r, C: c})
 	}
 	return out
+}
+
+func (s *Server) handleGravity(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	inverted := r.URL.Query().Get("inverted") == "true"
+	
+	s.mu.Lock()
+	s.g.InvertedGravity = inverted
+	s.mu.Unlock()
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -1,14 +1,14 @@
 {{define "board_small"}}
-<div class="board neon-board">
+<div class="neon-board">
   <div class="board-frame-neon">
     <div class="board-inner-neon"
          style="--rows: {{.Rows}}; --cols: {{.Cols}};
                 --cell: 58px; --gap: 4px;">
                 
       <form action="/play" method="post">
-        <div class="controls neon-controls">
+        <div class="neon-controls">
           {{range $c := rangeN .Cols}}
-            <button class="colbtn neon-btn" name="col" value="{{$c}}" {{if ne $.Winner 0}}disabled{{end}}>▼</button>
+            <button class="neon-btn" name="col" value="{{$c}}" {{if ne $.Winner 0}}disabled{{end}}>▼</button>
           {{end}}
         </div>
 

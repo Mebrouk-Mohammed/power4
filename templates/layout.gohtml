@@ -6,35 +6,6 @@
   <title>Power4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { --cell: 64px; --gap: 12px; --pad: 18px; --offx: 0px; --offy: 0px; --imgW: 720px; }
-
-    /* Configuration spécifique pour chaque taille de plateau */
-    .board-small .board-inner {
-      --cell: 58px; --gap: 0,9px; --pad: 14px;
-      --offx: 103px; --offy: 86px; --imgW: 560px;
-      width: 560px;
-    }
-    
-    .board-medium .board-inner {
-      --cell: 52px; --gap: 12px; --pad: 18px;
-      --offx: 110px; --offy: 190px; --imgW: 720px;
-      width: 720px;
-    }
-    
-    .board-large .board-inner {
-      --cell: 50px; --gap: 10px; --pad: 18px;
-      --offx: 204px; --offy: 160px; --imgW: 840px;
-      width: 840px;
-    }
-
-    body{font-family:system-ui;background:#0b1020;color:#f1faee;margin:0}ayout"}}
-<!doctype html>
-<html lang="fr">
-<head>
-     <meta charset="utf-8">
-  <title>Power4</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
     :root { --cell: 58px; --gap: 1px; --pad: 15px; --offx: 85px; --offy: 95px; --imgW: 720px; }
 
     body{font-family:system-ui;background:#0b1020;color:#f1faee;margin:0}
@@ -48,60 +19,222 @@
     .colbtn:disabled{opacity:.6;cursor:not-allowed}
 
     .board{background:#10223f;padding:16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-    .board-inner{
-      position:relative;
-      padding: var(--pad);
-      border-radius:12px;
-      width: fit-content;
-      margin: 0 auto;
-      overflow: hidden;
-    }
-    .board-img{display:block;width:var(--imgW);height:auto;user-select:none;pointer-events:none}
 
-    .grid-abs{
-      position:absolute;
-      top: var(--offy);
-      left: var(--offx);
-      display:grid;
+    .board-inner{display:grid;gap:var(--gap);padding:var(--pad);position:relative;margin:0 auto;
+      background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+      background-size:var(--imgW) auto;background-repeat:no-repeat;background-position:calc(var(--offx) * -1) calc(var(--offy) * -1)}
+    
+    .cell{width:var(--cell);height:var(--cell);border-radius:50%;position:relative}
+    .cell button{width:100%;height:100%;border:0;background:transparent;border-radius:50%;cursor:pointer}
+    .cell button:disabled{cursor:not-allowed}
+    .cell.p1{background:url('/static/img/orange_token.png') center/contain no-repeat}
+    .cell.p2{background:url('/static/img/purple_token.png') center/contain no-repeat}
+    .cell.blocked{background:#666;border-radius:50%}
+
+    /* Contrôles de gravité */
+    .gravity-controls{display:flex;align-items:center;gap:10px;margin-left:20px;padding:8px 12px;background:#1a2844;border-radius:6px;border:1px solid #2d3f70}
+    .gravity-btn{padding:6px 12px;border:1px solid #2d3f70;background:#152348;color:#a8dadc;border-radius:4px;cursor:pointer;font-weight:600;text-decoration:none;font-size:12px;transition:all 0.2s}
+    .gravity-btn:hover{border-color:#4a90e2;background:#1e2d54}
+    .gravity-btn.active{border-color:#4a90e2;background:#2d4a85;color:#fff}
+    .gravity-indicator{font-size:11px;color:#a8dadc;font-weight:bold}
+
+    /* CSS Néon pour les plateaux */
+    .neon-board {
+      background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 600px;
+    }
+
+    .board-frame-neon {
+      background: rgba(8, 18, 45, 0.95);
+      border: 3px solid #00b4ff;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 
+        0 0 25px rgba(0, 180, 255, 0.5),
+        0 0 50px rgba(0, 180, 255, 0.25),
+        inset 0 0 25px rgba(0, 80, 160, 0.2);
+      position: relative;
+    }
+
+    .board-frame-neon::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff);
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0.7;
+      filter: blur(3px);
+    }
+
+    .board-inner-neon {
+      position: relative;
+    }
+
+    .neon-controls {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .neon-btn {
+      padding: 8px;
+      background: rgba(0, 180, 255, 0.2);
+      border: 2px solid #00b4ff;
+      border-radius: 8px;
+      color: #00ccff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+
+    .neon-btn:hover:not(:disabled) {
+      background: rgba(0, 180, 255, 0.4);
+      box-shadow: 0 0 15px rgba(0, 180, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .neon-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .game-grid-neon {
+      display: grid;
       grid-template-columns: repeat(var(--cols), var(--cell));
       grid-template-rows: repeat(var(--rows), var(--cell));
       gap: var(--gap);
-      width: calc(var(--cols)*var(--cell) + (var(--cols) - 1)*var(--gap));
-      height: calc(var(--rows)*var(--cell) + (var(--rows) - 1)*var(--gap));
+      background: rgba(12, 28, 65, 0.9);
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(0, 180, 255, 0.7);
+      box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.4);
     }
 
-    .token{width:var(--cell);height:var(--cell);border-radius:50%;background-position:center;background-size:cover;
-           box-shadow:0 0 10px rgba(0,0,0,.35), inset 0 6px 10px rgba(0,0,0,.35)}
-
-    .controls{display:grid;grid-template-columns:repeat({{.Cols}},1fr);gap:10px;margin:14px 0 22px}
-
-    /* Mode debug : visualiser les cellules pour caler au pixel */
-    .debug .board-inner{
-      --gap: 0px !important;
+    .hole-neon {
+      width: var(--cell);
+      height: var(--cell);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, 
+        rgba(0, 120, 220, 0.15) 0%, 
+        rgba(8, 18, 45, 0.95) 60%, 
+        rgba(0, 40, 100, 0.8) 100%);
+      border: 2px solid #00b4ff;
+      box-shadow: 
+        0 0 12px rgba(0, 180, 255, 0.35),
+        inset 0 0 12px rgba(0, 60, 140, 0.5),
+        inset 0 3px 6px rgba(0, 180, 255, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
     }
-    .debug .grid-abs button{
-      outline:1px dashed rgba(255,255,255,.35);
-      background:rgba(255,255,255,.06);
-      border-radius:50%;
+
+    .hole-neon::before {
+      content: '';
+      position: absolute;
+      width: calc(var(--cell) - 8px);
+      height: calc(var(--cell) - 8px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, 
+        rgba(0, 180, 255, 0.1) 0%, 
+        transparent 50%);
+      border: 1px solid rgba(0, 180, 255, 0.25);
+      pointer-events: none;
+    }
+
+    .hole-neon:hover:not(:disabled) {
+      box-shadow: 
+        0 0 18px rgba(0, 180, 255, 0.6),
+        inset 0 0 15px rgba(0, 100, 255, 0.4);
+      border-color: #00ccff;
+      transform: scale(1.05);
+    }
+
+    .token-p1-neon, .token-p2-neon {
+      width: calc(var(--cell) - 4px);
+      height: calc(var(--cell) - 4px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .board-base-neon {
+      width: 100%;
+      height: 35px;
+      background: linear-gradient(to bottom, 
+        rgba(0, 180, 255, 0.9) 0%, 
+        rgba(0, 140, 220, 1) 30%, 
+        rgba(0, 100, 180, 1) 100%);
+      border-radius: 0 0 14px 14px;
+      box-shadow: 
+        0 6px 16px rgba(0, 180, 255, 0.4),
+        inset 0 3px 6px rgba(255, 255, 255, 0.15);
+      border: 3px solid #00b4ff;
+      border-top: none;
+      margin-top: -2px;
+    }
+
+    .board-feet-neon {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 35px;
+      margin-top: -3px;
+    }
+
+    .board-foot-neon {
+      width: 40px;
+      height: 20px;
+      background: linear-gradient(to bottom, 
+        rgba(0, 140, 220, 1) 0%, 
+        rgba(0, 100, 180, 1) 100%);
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 12px rgba(0, 180, 255, 0.35);
+      border: 2px solid #00b4ff;
+      border-top: none;
     }
   </style>
 </head>
-<body class="{{if .Debug}}debug{{end}}">
+<body>
   <div class="wrap">
     <div class="status">
-      {{if eq .Winner 0}} Tour du joueur <strong>{{.CurrentPlayer}}</strong>
-      {{else if eq .Winner -1}} <strong>Égalité</strong>
-      {{else}} 🎉 Joueur <strong>{{.Winner}}</strong> gagne !
-      {{end}}
-
-      <a class="link" href="{{if .Debug}}/reset?debug=1{{else}}/reset{{end}}">Réinitialiser</a>
-      <a class="link" href="/auth">Compte</a>
-
-      {{if .Debug}}
-        <a class="link" href="/">Masquer l’aide</a>
+      {{if eq .Winner 0}}
+        <span>Tour du joueur {{.CurrentPlayer}}</span>
       {{else}}
-        <a class="link" href="/?debug=1">Aide alignement</a>
+        <span>🎉 Joueur {{.Winner}} a gagné !</span>
       {{end}}
+
+      <a class="link" href="/reset">Reset</a>
+
+      <!-- Contrôles de gravité -->
+      <div class="gravity-controls">
+        <span class="gravity-indicator">Gravité:</span>
+        <a href="/gravity?inverted=false" class="gravity-btn {{if not .InvertedGravity}}active{{end}}">
+          ⬇️ Normale
+        </a>
+        <a href="/gravity?inverted=true" class="gravity-btn {{if .InvertedGravity}}active{{end}}">
+          ⬆️ Inversée
+        </a>
+        {{if .InvertedGravity}}
+          <span class="gravity-indicator">Jetons tombent vers le HAUT!</span>
+        {{end}}
+      </div>
 
       <form action="/new" method="get" class="sizes">
         {{if .Debug}}<input type="hidden" name="debug" value="1">{{end}}
@@ -111,7 +244,7 @@
       </form>
     </div>
 
-    <div class="{{if eq .BoardTemplate "board_small"}}board-small{{else if eq .BoardTemplate "board_large"}}board-large{{else}}board-medium{{end}}">
+    <div class="board">
       {{if eq .BoardTemplate "board_small"}}
         {{template "board_small" .}}
       {{else if eq .BoardTemplate "board_large"}}
