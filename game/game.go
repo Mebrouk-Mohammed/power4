@@ -3,10 +3,9 @@ package game
 import "sync"
 
 const (
-	Empty   = 0  // case vide
-	P1      = 1  // joueur 1
-	P2      = 2  // joueur 2
-	Blocked = -1 // case bloquée
+	Empty = 0 // case vide
+	P1    = 1 // joueur 1
+	P2    = 2 // joueur 2
 )
 
 type Position struct{ R, C int }
@@ -18,7 +17,7 @@ type Game struct {
 	Winner          int
 	MoveCount       int
 	InvertedGravity bool
-	mu              sync.Mutex
+	Mu              sync.Mutex
 }
 
 func New(rows, cols int) *Game {
@@ -37,8 +36,8 @@ func New(rows, cols int) *Game {
 }
 
 func (g *Game) Reset(rows, cols int) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
 
 	g.Rows = rows
 	g.Cols = cols
@@ -51,22 +50,11 @@ func (g *Game) Reset(rows, cols int) {
 	g.MoveCount = 0
 }
 
-func (g *Game) ApplyBlocked(blocked []Position) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
 
-	for _, p := range blocked {
-		if p.R >= 0 && p.R < g.Rows && p.C >= 0 && p.C < g.Cols {
-			if g.Board[p.R][p.C] == Empty {
-				g.Board[p.R][p.C] = Blocked
-			}
-		}
-	}
-}
 
 func (g *Game) Drop(col int) bool {
-	g.mu.Lock()
-	defer g.mu.Unlock()
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
 
 	if col < 0 || col >= g.Cols || g.Winner != 0 {
 		return false
@@ -114,7 +102,7 @@ func (g *Game) checkEnd(r, c int) {
 		g.Winner = p
 		return
 	}
-	if g.MoveCount == g.Rows*g.Cols-g.countBlocked() {
+	if g.MoveCount == g.Rows*g.Cols {
 		g.Winner = -1
 	}
 }
@@ -134,14 +122,4 @@ func (g *Game) countDir(r, c, dr, dc, p int) int {
 	return n
 }
 
-func (g *Game) countBlocked() int {
-	nb := 0
-	for r := range g.Board {
-		for c := range g.Board[r] {
-			if g.Board[r][c] == Blocked {
-				nb++
-			}
-		}
-	}
-	return nb
-}
+

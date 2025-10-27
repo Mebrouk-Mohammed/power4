@@ -53,7 +53,6 @@ func NewDefault() *Server {
 	))
 
 	g := game.New(6, 9) // medium par défaut
-	g.ApplyBlocked(genBlocked(6, 9, 5))
 
 	return &Server{
 		g:         g,
@@ -133,15 +132,6 @@ func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
 	rows, cols := s.g.Rows, s.g.Cols
 	s.g.Reset(rows, cols)
-	// remettre des blocs selon le plateau courant
-	switch s.boardTmpl {
-	case "board_small":
-		s.g.ApplyBlocked(genBlocked(rows, cols, 3))
-	case "board_large":
-		s.g.ApplyBlocked(genBlocked(rows, cols, 7))
-	default:
-		s.g.ApplyBlocked(genBlocked(rows, cols, 5))
-	}
 	s.mu.Unlock()
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -151,55 +141,27 @@ func (s *Server) handleNew(w http.ResponseWriter, r *http.Request) {
 	size := r.URL.Query().Get("size")
 	log.Println("Switch difficulty →", size)
 
-	var rows, cols, nbBlocked int
+	var rows, cols int
 	var tmpl string
 
 	switch size {
-	case "small": // Easy : 6x7, 3 cases bloquées
+	case "small": // Easy : 6x7
 		rows, cols = 6, 7
-		nbBlocked = 3
 		tmpl = "board_small"
-	case "large": // Hard : 7x8, 7 cases bloquées
+	case "large": // Hard : 7x8
 		rows, cols = 7, 8
-		nbBlocked = 7
 		tmpl = "board_large"
-	default: // Medium/Normal : 6x9, 5 cases bloquées
+	default: // Medium/Normal : 6x9
 		rows, cols = 6, 9
-		nbBlocked = 5
 		tmpl = "board_medium"
 	}
 
 	s.mu.Lock()
 	s.g.Reset(rows, cols)
-	s.g.ApplyBlocked(genBlocked(rows, cols, nbBlocked))
 	s.boardTmpl = tmpl
 	s.mu.Unlock()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-// genBlocked choisit 'n' cases à bloquer aléatoirement
-func genBlocked(rows, cols, n int) []game.Position {
-	if n <= 0 {
-		return nil
-	}
-	seen := make(map[int]struct{}, n)
-	out := make([]game.Position, 0, n)
-	max := rows * cols
-	if n > max {
-		n = max
-	}
-	for len(out) < n {
-		k := rand.Intn(max) // 0..rows*cols-1
-		if _, ok := seen[k]; ok {
-			continue
-		}
-		seen[k] = struct{}{}
-		r := k / cols
-		c := k % cols
-		out = append(out, game.Position{R: r, C: c})
-	}
-	return out
 }
 
 func (s *Server) handleGravity(w http.ResponseWriter, r *http.Request) {
