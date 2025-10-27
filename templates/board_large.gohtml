@@ -1,35 +1,36 @@
 {{define "board_large"}}
-<div class="board">
-  <div class="board-inner"
-       style="--rows: {{.Rows}}; --cols: {{.Cols}}; --imgW: 840px;
-              --cell: 50px; --gap: 10px; --pad: 18px;
-              --offx: 204px; --offy: 160px;">
-    <img class="board-img" src="/static/img/hard_difficulty.png" alt="plateau hard">
+<style>
+  .grid{display:grid;grid-template-columns:repeat({{.Cols}},62px);gap:12px;justify-content:center;margin:8px 0 14px}
+  .dropbtn{width:62px;height:38px;border-radius:10px;border:1px solid #2a355a;background:#1a2547;color:#a8dadc;cursor:pointer;transition:.15s}
+  .dropbtn:hover{background:#213055;color:#e9fbff;transform:translateY(-1px)}
+  .cells{display:grid;grid-template-columns:repeat({{.Cols}},62px);gap:12px;justify-content:center}
+  .cell{width:62px;height:62px;border-radius:50%;background:#0d1a33;display:grid;place-items:center;box-shadow:inset 0 0 0 2px #2a355a}
+  .empty{opacity:.25}
+</style>
 
-    <form action="/play" method="post">
-      <div class="controls">
-        {{range $c := rangeN .Cols}}
-          <button class="colbtn" name="col" value="{{$c}}" {{if ne $.Winner 0}}disabled{{end}}>▼</button>
-        {{end}}
-      </div>
-
-      <div class="grid-abs">
-        {{range $i, $row := .Board}}
-          {{range $j, $cell := $row}}
-            <button name="col" value="{{$j}}" type="submit"
-                    style="all:unset;width:var(--cell);height:var(--cell);border-radius:50%;
-                           display:block;position:relative;cursor:pointer;"
-                    {{if ne $.Winner 0}}disabled{{end}}>
-              {{if eq $cell 1}}
-                {{template "token_p1" $}}
-              {{else if eq $cell 2}}
-                {{template "token_p2" $}}
-              {{end}}
-            </button>
-          {{end}}
-        {{end}}
-      </div>
+<div class="grid">
+  {{range $c := rangeN .Cols}}
+    <form method="post" action="/play" style="margin:0">
+      <input type="hidden" name="col" value="{{$c}}">
+      <button class="dropbtn" type="submit">↓</button>
     </form>
-  </div>
+  {{end}}
+</div>
+
+<div class="cells">
+  {{range $r := rangeN .Rows}}
+    {{range $c := rangeN .Cols}}
+      {{ $v := index (index $.Board $r) $c }}
+      <div class="cell">
+        {{if eq $v 1}}
+          {{template "token_p1" $}}
+        {{else if eq $v 2}}
+          {{template "token_p2" $}}
+        {{else}}
+          <span class="empty">●</span>
+        {{end}}
+      </div>
+    {{end}}
+  {{end}}
 </div>
 {{end}}
