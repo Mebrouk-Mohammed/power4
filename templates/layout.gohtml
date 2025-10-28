@@ -721,6 +721,8 @@
         <span>Tour du joueur {{.CurrentPlayer}}</span>
         <!-- Chronomètre de tour (10s) -->
         <span id="turn-timer" style="margin-left:12px;color:#ffd166;font-weight:700;">Temps restant: <span id="time-left">10</span>s</span>
+      {{else if eq .Winner -1}}
+        <span>🤝 Match nul ! Plateau plein</span>
       {{else}}
         <span>🎉 Joueur {{.Winner}} a gagné !</span>
       {{end}}
