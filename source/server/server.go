@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"game"
+	"power4/game"
 )
 
 type viewData struct {
@@ -63,6 +63,8 @@ func NewDefault() *Server {
 
 func (s *Server) Listen(addr string) error {
 	mux := http.NewServeMux()
+	// Serve static files (images, css, js) from the "static" directory
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("/", safe(s.handleIndex))
 	mux.HandleFunc("/play", safe(s.handlePlay))
 	mux.HandleFunc("/reset", safe(s.handleReset))
