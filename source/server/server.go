@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"math/rand"
@@ -67,6 +68,7 @@ func (s *Server) Listen(addr string) error {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("/", safe(s.handleIndex))
 	mux.HandleFunc("/play", safe(s.handlePlay))
+	mux.HandleFunc("/random_move", safe(s.handleRandomMove))
 	mux.HandleFunc("/reset", safe(s.handleReset))
 	mux.HandleFunc("/new", safe(s.handleNew))
 	mux.HandleFunc("/gravity", safe(s.handleGravity))
@@ -128,6 +130,42 @@ func (s *Server) handlePlay(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// handleRandomMove choisit une colonne au hasard (parmi les colonnes non pleines)
+// et y pose le jeton courant. Utilisé quand le timer côté client expire.
+func (s *Server) handleRandomMove(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.g.Winner != 0 {
+		http.Error(w, "game over", http.StatusConflict)
+		return
+	}
+
+	// construire la liste des colonnes disponibles
+	avail := make([]int, 0)
+	for c := 0; c < s.g.Cols; c++ {
+		if s.g.Board[0][c] == game.Empty {
+			avail = append(avail, c)
+		}
+	}
+	if len(avail) == 0 {
+		http.Error(w, "board full", http.StatusConflict)
+		return
+	}
+
+	col := avail[rand.Intn(len(avail))]
+	_ = s.g.Drop(col)
+
+	// Répondre avec l'état minimal pour le client (ok:true)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 }
 
 func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {

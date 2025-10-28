@@ -584,6 +584,8 @@
     <div class="status">
       {{if eq .Winner 0}}
         <span>Tour du joueur {{.CurrentPlayer}}</span>
+        <!-- Chronomètre de tour (10s) -->
+        <span id="turn-timer" style="margin-left:12px;color:#ffd166;font-weight:700;">Temps restant: <span id="time-left">10</span>s</span>
       {{else}}
         <span>🎉 Joueur {{.Winner}} a gagné !</span>
       {{end}}
@@ -761,6 +763,10 @@
       console.log('🚀 Système de confettis initialisé');
     });
   </script>
+</script>
+
+  <!-- Script timer: démarre un chrono de 10s par tour et appelle /random_move si timeout -->
+  <script src="/static/js/timer.js"></script>
 
 </body>
 </html>
