@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"power4/game"
+	"game"
 )
 
 type viewData struct {
