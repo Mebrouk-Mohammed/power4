@@ -98,6 +98,19 @@
     .cell.p1{background:url('/static/img/orange_token.png') center/contain no-repeat}
     .cell.p2{background:url('/static/img/purple_token.png') center/contain no-repeat}
     .cell.blocked{background:#666;border-radius:50%}
+    /* Token clone pour l'animation physique */
+    .token-clone {
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      will-change: transform;
+      /* Pas de transition CSS : animation pilotée par requestAnimationFrame pour fluidité */
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
 
     /* Contrôles de gravité */
     .gravity-controls{display:flex;align-items:center;gap:10px;margin-left:20px;padding:8px 12px;background:#1a2844;border-radius:6px;border:1px solid #2d3f70}
@@ -724,7 +737,7 @@
       {{else if eq .Winner -1}}
         <span>🤝 Match nul ! Plateau plein</span>
       {{else}}
-        <span>🎉 Joueur {{.Winner}} a gagné !</span>
+        <span>🎉 Victoire du joueur {{.Winner}} !</span>
       {{end}}
 
       <a class="link" href="/reset">Reset</a>
@@ -975,7 +988,8 @@
       console.log('🚀 Système de confettis initialisé');
     });
   </script>
-</script>
+
+  <script src="/static/js/physics.js"></script>
 
   <!-- Script timer: démarre un chrono de 10s par tour et appelle /random_move si timeout -->
   <script src="/static/js/timer.js"></script>
