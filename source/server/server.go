@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
+
 	"power4/game"
 )
 
@@ -29,6 +31,9 @@ type Server struct {
 	g         *game.Game
 	tpls      *template.Template
 	boardTmpl string // "board_small" | "board_medium" | "board_large"
+	// websocket clients (simple hub)
+	wsUpgrader websocket.Upgrader
+	wsClients  map[*websocket.Conn]bool
 }
 
 func NewDefault() *Server {
@@ -59,6 +64,8 @@ func NewDefault() *Server {
 		g:         g,
 		tpls:      tpls,
 		boardTmpl: "board_medium",
+		wsUpgrader: websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }},
+		wsClients:  make(map[*websocket.Conn]bool),
 	}
 }
 
@@ -66,6 +73,8 @@ func (s *Server) Listen(addr string) error {
 	mux := http.NewServeMux()
 	// Serve static files (images, css, js) from the "static" directory
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	// websocket endpoint
+	mux.HandleFunc("/ws", safe(s.handleWS))
 	mux.HandleFunc("/", safe(s.handleIndex))
 	mux.HandleFunc("/play", safe(s.handlePlay))
 	mux.HandleFunc("/random_move", safe(s.handleRandomMove))
@@ -129,6 +138,9 @@ func (s *Server) handlePlay(w http.ResponseWriter, r *http.Request) {
 	_ = s.g.Drop(col) // ignore si colonne pleine/terminée
 	s.mu.Unlock()
 
+	// broadcast to websocket clients that state changed
+	go s.broadcastState()
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -162,6 +174,9 @@ func (s *Server) handleRandomMove(w http.ResponseWriter, r *http.Request) {
 
 	col := avail[rand.Intn(len(avail))]
 	_ = s.g.Drop(col)
+
+	// notifier clients
+	go s.broadcastState()
 
 	// Répondre avec l'état minimal pour le client (ok:true)
 	w.Header().Set("Content-Type", "application/json")
@@ -217,4 +232,83 @@ func (s *Server) handleGravity(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// WebSocket handler: upgrade and register client, send initial state and keep connection alive
+func (s *Server) handleWS(w http.ResponseWriter, r *http.Request) {
+	conn, err := s.wsUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("ws upgrade:", err)
+		return
+	}
+
+	s.mu.Lock()
+	s.wsClients[conn] = true
+	s.mu.Unlock()
+
+	// send initial state
+	s.sendStateToConn(conn)
+
+	// read loop — we don't expect messages, but detect close
+	for {
+		if _, _, err := conn.NextReader(); err != nil {
+			break
+		}
+	}
+
+	// cleanup
+	s.mu.Lock()
+	delete(s.wsClients, conn)
+	s.mu.Unlock()
+	conn.Close()
+}
+
+// sendStateToConn sends current game state as JSON to a single connection
+func (s *Server) sendStateToConn(conn *websocket.Conn) {
+	s.mu.Lock()
+	payload := map[string]interface{}{
+		"board":         s.g.Board,
+		"rows":          s.g.Rows,
+		"cols":          s.g.Cols,
+		"currentPlayer": s.g.CurrentPlayer,
+		"winner":        s.g.Winner,
+		"boardTemplate": s.boardTmpl,
+	}
+	s.mu.Unlock()
+
+	b, _ := json.Marshal(payload)
+	conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
+	if err := conn.WriteMessage(websocket.TextMessage, b); err != nil {
+		log.Println("ws write error:", err)
+	}
+}
+
+// broadcastState sends the current game state JSON to all connected websocket clients
+func (s *Server) broadcastState() {
+	s.mu.Lock()
+	payload := map[string]interface{}{
+		"board":         s.g.Board,
+		"rows":          s.g.Rows,
+		"cols":          s.g.Cols,
+		"currentPlayer": s.g.CurrentPlayer,
+		"winner":        s.g.Winner,
+		"boardTemplate": s.boardTmpl,
+	}
+	clients := make([]*websocket.Conn, 0, len(s.wsClients))
+	for c := range s.wsClients {
+		clients = append(clients, c)
+	}
+	s.mu.Unlock()
+
+	b, _ := json.Marshal(payload)
+	for _, c := range clients {
+		c.SetWriteDeadline(time.Now().Add(2 * time.Second))
+		if err := c.WriteMessage(websocket.TextMessage, b); err != nil {
+			// remove broken client
+			c.Close()
+			s.mu.Lock()
+			delete(s.wsClients, c)
+			s.mu.Unlock()
+		}
+	}
 }
