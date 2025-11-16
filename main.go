@@ -1,5 +1,6 @@
 package main
 
+<<<<<<< HEAD
 import "fmt"
 
 func main() {
@@ -18,4 +19,10 @@ func main() {
 	}
 
 	fmt.Println("✅ Partie créée avec l'ID :", id)
+=======
+import "power4/app"
+
+func main() {
+	app.Main()
+>>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
 }

@@ -1,4 +1,5 @@
 {{define "board_large"}}
+<<<<<<< HEAD
 <div class="board neon-board-large">
   <div class="board-frame-neon-large">
     <div class="board-inner-neon-large"
@@ -34,6 +35,41 @@
       <div class="board-foot-neon-large"></div>
     </div>
   </div>
+=======
+<style>
+  .grid{display:grid;grid-template-columns:repeat({{.Cols}},62px);gap:12px;justify-content:center;margin:8px 0 14px}
+  .dropbtn{width:62px;height:38px;border-radius:10px;border:1px solid #2a355a;background:#1a2547;color:#a8dadc;cursor:pointer;transition:.15s}
+  .dropbtn:hover{background:#213055;color:#e9fbff;transform:translateY(-1px)}
+  .cells{display:grid;grid-template-columns:repeat({{.Cols}},62px);gap:12px;justify-content:center}
+  .cell{width:62px;height:62px;border-radius:50%;background:#0d1a33;display:grid;place-items:center;box-shadow:inset 0 0 0 2px #2a355a}
+  .empty{opacity:.25}
+</style>
+
+<div class="grid">
+  {{range $c := rangeN .Cols}}
+    <form method="post" action="/play" style="margin:0">
+      <input type="hidden" name="col" value="{{$c}}">
+      <button class="dropbtn" type="submit">↓</button>
+    </form>
+  {{end}}
+</div>
+
+<div class="cells">
+  {{range $r := rangeN .Rows}}
+    {{range $c := rangeN .Cols}}
+      {{ $v := index (index $.Board $r) $c }}
+      <div class="cell">
+        {{if eq $v 1}}
+          {{template "token_p1" $}}
+        {{else if eq $v 2}}
+          {{template "token_p2" $}}
+        {{else}}
+          <span class="empty">●</span>
+        {{end}}
+      </div>
+    {{end}}
+  {{end}}
+>>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
 </div>
 
 <style>

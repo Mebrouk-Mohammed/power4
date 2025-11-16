@@ -2,16 +2,36 @@
 <!doctype html>
 <html lang="fr">
 <head>
+<<<<<<< HEAD
      <meta charset="utf-8">
   <title>Power4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root { --cell: 58px; --gap: 1px; --pad: 15px; --offx: 85px; --offy: 95px; --imgW: 720px; }
+=======
+  <meta charset="utf-8">
+  <title>Puissance 4 — Jeu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --cell: 64px; --gap: 12px; }
+    html,body{margin:0;padding:0;background:#0b1020;color:#f1faee;font-family:system-ui,Segoe UI,Arial}
+    .wrap{max-width:1100px;margin:32px auto;padding:16px}
+>>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
 
-    body{font-family:system-ui;background:#0b1020;color:#f1faee;margin:0}
-    .wrap{max-width:1100px;margin:40px auto;padding:16px}
+    /* mini-nav haut avec surbrillance légère */
+    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .nav a{
+      display:inline-block;padding:8px 12px;border-radius:10px;
+      border:1px solid #2a355a;background:#141e38;color:#a8dadc;text-decoration:none;
+      transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
+    }
+    .nav a:hover, .nav a:focus-visible{
+      background:#213055;color:#e9fbff;transform:translateY(-1px);
+      box-shadow:0 0 0 2px #a8dadc33, 0 8px 18px #0008; outline:none;
+    }
 
     .status{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+<<<<<<< HEAD
     .link{color:#a8dadc}
 
     .sizes{display:flex;gap:8px;margin-left:8px}
@@ -577,10 +597,16 @@
       border: 2px solid #00b4ff;
       border-top: none;
     }
+=======
+    .status strong{color:#ffd166}
+
+    .board{background:#10223f;padding:16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+>>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
   </style>
 </head>
 <body>
   <div class="wrap">
+<<<<<<< HEAD
     <div class="status">
       {{if eq .Winner 0}}
         <span>Tour du joueur {{.CurrentPlayer}}</span>
@@ -621,6 +647,45 @@
         {{template "board_medium" .}}
       {{end}}
     </div>
+=======
+
+    <!-- NAV vers PHP + tailles + reset -->
+    <div class="nav">
+      <a href="{{.PHPBase}}/index.php">⬅️ Retour au menu</a>
+      {{if .Username}}
+        <a href="{{.PHPBase}}/profile.php">👤 Profil ({{.Username}})</a>
+      {{else}}
+        <a href="{{.PHPBase}}/register.php">Se connecter / Créer un compte</a>
+      {{end}}
+      <a href="/reset">🔁 Réinitialiser</a>
+      <a href="/new?size=small">🟡 Small</a>
+      <a href="/new?size=medium">🟠 Medium</a>
+      <a href="/new?size=large">🔵 Large</a>
+    </div>
+
+    <!-- Statut -->
+    <div class="status">
+      {{if eq .Winner 0}}
+        Tour du joueur <strong>{{.CurrentPlayer}}</strong>
+      {{else if eq .Winner -1}}
+        <strong>Égalité</strong>
+      {{else}}
+        🎉 Joueur <strong>{{.Winner}}</strong> gagne !
+      {{end}}
+    </div>
+
+    <!-- Plateau -->
+    <div class="board">
+      {{if eq .BoardTemplate "board_small"}}
+        {{template "board_small" .}}
+      {{else if eq .BoardTemplate "board_large"}}
+        {{template "board_large" .}}
+      {{else}}
+        {{template "board_medium" .}}
+      {{end}}
+    </div>
+
+>>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
   </div>
 
   <script>
