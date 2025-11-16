@@ -1,20 +1,21 @@
 package main
 
-import (
-	"log"
-
-	"power4/auth"
-	"power4/source/server"
-)
+import "fmt"
 
 func main() {
-	// Initialise la base pour /login et /register (ne bloque pas le jeu si ça échoue)
-	if err := auth.InitDB(); err != nil {
-		log.Printf("auth.InitDB: %v (login/register désactivés)", err)
+	api := NewAPI()
+
+	uid, username, err := api.GetCurrentUser()
+	if err != nil {
+		panic("❌ Impossible de récupérer l'utilisateur connecté : " + err.Error())
 	}
 
-	s := server.NewDefault()
-	if err := s.Listen(":8080"); err != nil {
-		log.Fatal(err)
+	fmt.Println("👤 Connecté en tant que :", username, "(ID", uid, ")")
+
+	id, err := api.CreateGame(uid, 0)
+	if err != nil {
+		panic("❌ Erreur création de partie : " + err.Error())
 	}
+
+	fmt.Println("✅ Partie créée avec l'ID :", id)
 }
