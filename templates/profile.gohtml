@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="utf-8">
+ <title>Mon profil — Puissance 4</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <style>
+ :root{ --bg:#0f1115; --text:#e8e8e8; --panel:#161a22; --border:#232839; --accent:#ffa94d; --hover:#2a2f3a; }
+ body{background:var(--bg);color:var(--text);font-family:system-ui,Arial;margin:0}
+ .wrap{max-width:1000px;margin:40px auto 40px;padding:0 20px}
+ .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;gap:20px;align-items:flex-start}
+ .avatar{width:160px;height:160px;border-radius:14px;object-fit:cover;border:1px solid #2a3042}
+ .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .stat{background:#0f1320;border:1px solid var(--border);border-radius:10px;padding:12px}
+ input,textarea,button{background:#232839;color:var(--text);border:1px solid #2f3650;border-radius:8px;padding:8px 12px;width:100%}
+ textarea{min-height:90px}
+ h1{margin:0 0 14px 0;color:var(--accent)}
+ </style>
+</head>
+<body>
+ <div class="wrap">
+  <div style="margin-bottom:12px"><a href="/legacy">⬅️ Retour au menu</a></div>
+  <h1>Mon profil</h1>
+  <div class="card">
+   <div>
+    <img src="{{ .Avatar }}" alt="Avatar" class="avatar">
+   </div>
+   <div class="col">
+    <h2 style="margin-top:0;">{{ .Username }}</h2>
+    <p>Email : <strong>{{ .Email }}</strong></p>
+    <div class="grid" style="margin:12px 0">
+      <div class="stat"><strong>ELO</strong><br><span style="font-size:22px">{{ .ELO }}</span></div>
+      <div class="stat"><strong>Parties</strong><br>{{ .GamesPlayed }}</div>
+      <div class="stat"><strong>Victoires</strong><br>{{ .Wins }}</div>
+      <div class="stat"><strong>Défaites</strong><br>{{ .Losses }}</div>
+      <div class="stat"><strong>Nuls</strong><br>{{ .Draws }}</div>
+    </div>
+   </div>
+  </div>
+ </div>
+</body>
+</html>

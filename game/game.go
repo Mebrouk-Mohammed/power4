@@ -50,6 +50,8 @@ func (g *Game) Reset(rows, cols int) {
 	g.MoveCount = 0
 }
 
+
+
 func (g *Game) Drop(col int) bool {
 	g.Mu.Lock()
 	defer g.Mu.Unlock()
@@ -57,7 +59,7 @@ func (g *Game) Drop(col int) bool {
 	if col < 0 || col >= g.Cols || g.Winner != 0 {
 		return false
 	}
-
+	
 	if g.InvertedGravity {
 		// Gravité inversée : les jetons tombent vers le haut
 		for r := 0; r < g.Rows; r++ {
@@ -119,3 +121,4 @@ func (g *Game) countDir(r, c, dr, dc, p int) int {
 	}
 	return n
 }
+
