@@ -71,41 +71,68 @@ cd power4
 go run main.go -> lien http://localhost:8080
 
 - Architectures 
-POWER4/
-├── auth/
-│   └── auth.go
-├── users.db
-├── CSS/
-│   ├── easy_difficulty.css
-│   ├── hard_difficulty.css
-│   └── medium_difficulty.css
-├── docs/
-├── game/
-├── source/
-│   ├── interface-server/
-│   │   └── intserv.go
-│   └── server.go
-├── static/
-│   ├── img/
+Power4/
+│
+├── assets/
+│   ├── pictures/
+│   │   ├── a1.png
+│   │   ├── a2.png
+│   │   ├── a3.png
+│   │   ├── a4.png
+│   │   ├── a5.png
+│   │   ├── a6.png
+│   │   ├── a7.png
+│   │   ├── a8.png
+│   │   ├── a9.png
+│   │   ├── a10.png
+│   │   ├── a11.png
 │   │   ├── orange_token.png
 │   │   └── purple_token.png
-│   └── js/
-│       ├── physics.js
-│       └── timer.js
-└── templates/
-    └── board_large.gohtml
-    └── board_large.gohtml
-    └──board_medium.gohtml
-    └──board_small.gohtml
-    └──game.gohtml
-    └──home.gohtml
-    └──layout.gohtml
-    └──login.gohtml
-    └──register.gohtml
-    └──token_p1.gohtml
-    └──token_p2.gohtml
-
-Fichiers racine :
+│   │
+│   └── styles/
+│       ├── easy_difficulty.css
+│       ├── medium_difficulty.css
+│       └── hard_difficulty.css
+│
+├
+│
+├── docs/
+│   └── documentation projet /
+├                   ├  ── Sujet Power 4 Web (1).pdf
+├                   ├ ──  POWER 4.pptx
+│
+├── source/
+    ├── auth/
+│   │   ├── auth.go
+│   │   └── users.db
+│   ├── game/
+│   │   └── game.go
+│   ├── interface-server/
+│   │   └── intserv.go
+│   ├── js/
+│   │   ├── physics.js
+│   │   └── timer.js
+│   ├── server/
+│   │   └── server.go
+│   ├── templates/
+│   │   ├── board/
+│   │   │   ├── board_large.gohtml
+│   │   │   ├── board_medium.gohtml
+│   │   │   └── board_small.gohtml
+│   │   │
+│   │   ├── connexion/
+│   │   │   ├── home.gohtml
+│   │   │   ├── login.gohtml
+│   │   │   └── register.gohtml
+│   │   │
+│   │   ├── logic_game/
+│   │   │   ├── game.gohtml
+│   │   │   └── layout.gohtml
+│   │   │
+│   │   └── tokens/
+│   │       ├── token_p1.gohtml
+│   │       └── token_p2.gohtml
+│
 ├── go.mod
 ├── go.sum
 ├── main.go
@@ -130,4 +157,4 @@ Limites connues & pistes d’amélioration:
 - Pas de sécurisation url
 
 Crédits: 
-Développé par Flavien , Chloé , Mohammed
+Développé par Flavien Leneveu, Chloé Humbert , Mohammed Mebrouk
