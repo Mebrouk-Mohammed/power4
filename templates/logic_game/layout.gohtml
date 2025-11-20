@@ -1,0 +1,999 @@
+{{define "layout"}}
+<!doctype html>
+<html lang="fr">
+<head>
+     <meta charset="utf-8">
+  <title>Power4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --cell: 58px; --gap: 1px; --pad: 15px; --offx: 85px; --offy: 95px; --imgW: 720px; }
+
+    body{font-family:system-ui;background:#0b1020;color:#f1faee;margin:0}
+    .wrap{max-width:1100px;margin:40px auto;padding:16px}
+
+    .status{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+    .link{color:#a8dadc}
+
+    .sizes{display:flex;gap:8px;margin-left:8px}
+    .colbtn{
+      padding:8px;
+      border-radius:8px;
+      border:2px solid #00ffff;
+      background:linear-gradient(145deg, #152348, #1a2854);
+      color:#00ffff;
+      font-weight:600;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      text-shadow:0 0 10px #00ffff;
+      box-shadow:
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 10px rgba(0, 255, 255, 0.1);
+      transition:all 0.3s ease;
+    }
+    .colbtn:hover{
+      border-color:#ff00ff;
+      color:#ff00ff;
+      text-shadow:0 0 15px #ff00ff;
+      box-shadow:
+        0 0 20px rgba(255, 0, 255, 0.7),
+        0 0 40px rgba(255, 0, 255, 0.4),
+        inset 0 0 15px rgba(255, 0, 255, 0.2);
+      transform:translateY(-2px);
+    }
+    .colbtn:active{
+      transform:translateY(0);
+      box-shadow:
+        0 0 15px rgba(0, 255, 255, 0.8),
+        inset 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    .colbtn:disabled{
+      opacity:.4;
+      cursor:not-allowed;
+      border-color:#666;
+      color:#666;
+      text-shadow:none;
+      box-shadow:none;
+      transform:none;
+    }
+
+    .board{background:#10223f;padding:16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+
+    .board-inner{display:grid;gap:var(--gap);padding:var(--pad);position:relative;margin:0 auto;
+      background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+      background-size:var(--imgW) auto;background-repeat:no-repeat;background-position:calc(var(--offx) * -1) calc(var(--offy) * -1)}
+    
+    .cell{width:var(--cell);height:var(--cell);border-radius:50%;position:relative}
+    .cell button{
+      width:100%;
+      height:100%;
+      border:2px solid transparent;
+      background:transparent;
+      border-radius:50%;
+      cursor:pointer;
+      position:relative;
+      transition:all 0.3s ease;
+      overflow:hidden;
+    }
+    .cell button:hover{
+      border-color:#00ccff;
+      box-shadow:
+        0 0 15px rgba(0, 204, 255, 0.6),
+        0 0 30px rgba(0, 204, 255, 0.3),
+        inset 0 0 15px rgba(0, 204, 255, 0.1);
+      transform:scale(1.1);
+    }
+    .cell button:active{
+      transform:scale(1.05);
+      box-shadow:
+        0 0 20px rgba(0, 204, 255, 0.8),
+        inset 0 0 20px rgba(0, 204, 255, 0.2);
+    }
+    .cell button:disabled{
+      cursor:not-allowed;
+      border-color:transparent;
+      box-shadow:none;
+      transform:none;
+    }
+    .cell.p1{background:url('/static/img/orange_token.png') center/contain no-repeat}
+    .cell.p2{background:url('/static/img/purple_token.png') center/contain no-repeat}
+    .cell.blocked{background:#666;border-radius:50%}
+    /* Token clone pour l'animation physique */
+    .token-clone {
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      will-change: transform;
+      /* Pas de transition CSS : animation pilotée par requestAnimationFrame pour fluidité */
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
+
+    /* Contrôles de gravité */
+    .gravity-controls{display:flex;align-items:center;gap:10px;margin-left:20px;padding:8px 12px;background:#1a2844;border-radius:6px;border:1px solid #2d3f70}
+    .gravity-btn{
+      padding:6px 12px;
+      border:2px solid #00ff88;
+      background:linear-gradient(145deg, #152348, #1a2854);
+      color:#00ff88;
+      border-radius:4px;
+      cursor:pointer;
+      font-weight:600;
+      text-decoration:none;
+      font-size:12px;
+      position:relative;
+      overflow:hidden;
+      text-shadow:0 0 8px #00ff88;
+      box-shadow:
+        0 0 8px rgba(0, 255, 136, 0.5),
+        inset 0 0 8px rgba(0, 255, 136, 0.1);
+      transition:all 0.3s ease;
+    }
+    .gravity-btn:hover{
+      border-color:#ffff00;
+      color:#ffff00;
+      text-shadow:0 0 12px #ffff00;
+      box-shadow:
+        0 0 15px rgba(255, 255, 0, 0.7),
+        0 0 30px rgba(255, 255, 0, 0.4),
+        inset 0 0 12px rgba(255, 255, 0, 0.2);
+      transform:scale(1.05);
+    }
+    .gravity-btn.active{
+      border-color:#ff6600;
+      color:#ff6600;
+      background:linear-gradient(145deg, #2d1a00, #3d2400);
+      text-shadow:0 0 15px #ff6600;
+      box-shadow:
+        0 0 20px rgba(255, 102, 0, 0.8),
+        0 0 40px rgba(255, 102, 0, 0.5),
+        inset 0 0 15px rgba(255, 102, 0, 0.3);
+    }
+    .gravity-indicator{font-size:11px;color:#a8dadc;font-weight:bold}
+
+    /* CSS Néon pour les plateaux */
+    .neon-board {
+      background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 600px;
+    }
+
+
+
+    /* ===== ANIMATIONS NÉON POUR BOUTONS ===== */
+    
+    /* Animation de pulsation néon */
+    @keyframes neonPulse {
+      0%, 100% {
+        box-shadow: 
+          0 0 5px currentColor,
+          0 0 10px currentColor,
+          0 0 15px currentColor;
+      }
+      50% {
+        box-shadow: 
+          0 0 10px currentColor,
+          0 0 20px currentColor,
+          0 0 30px currentColor,
+          0 0 40px currentColor;
+      }
+    }
+
+    /* Animation de bordure néon qui tourne */
+    @keyframes neonBorderRotate {
+      0% {
+        border-color: #00ffff;
+        text-shadow: 0 0 10px #00ffff;
+      }
+      25% {
+        border-color: #ff00ff;
+        text-shadow: 0 0 10px #ff00ff;
+      }
+      50% {
+        border-color: #ffff00;
+        text-shadow: 0 0 10px #ffff00;
+      }
+      75% {
+        border-color: #00ff00;
+        text-shadow: 0 0 10px #00ff00;
+      }
+      100% {
+        border-color: #00ffff;
+        text-shadow: 0 0 10px #00ffff;
+      }
+    }
+
+    /* Animation de lueur électrique */
+    @keyframes electricGlow {
+      0%, 100% {
+        box-shadow: 
+          0 0 8px rgba(0, 255, 255, 0.5),
+          inset 0 0 8px rgba(0, 255, 255, 0.1);
+      }
+      20% {
+        box-shadow: 
+          0 0 15px rgba(255, 0, 255, 0.7),
+          0 0 25px rgba(255, 0, 255, 0.3),
+          inset 0 0 12px rgba(255, 0, 255, 0.2);
+      }
+      40% {
+        box-shadow: 
+          0 0 12px rgba(255, 255, 0, 0.6),
+          0 0 20px rgba(255, 255, 0, 0.4),
+          inset 0 0 10px rgba(255, 255, 0, 0.15);
+      }
+      60% {
+        box-shadow: 
+          0 0 18px rgba(0, 255, 0, 0.8),
+          0 0 30px rgba(0, 255, 0, 0.5),
+          inset 0 0 15px rgba(0, 255, 0, 0.25);
+      }
+      80% {
+        box-shadow: 
+          0 0 10px rgba(255, 102, 0, 0.6),
+          0 0 22px rgba(255, 102, 0, 0.4),
+          inset 0 0 12px rgba(255, 102, 0, 0.2);
+      }
+    }
+
+    /* Classe pour activer l'animation électrique */
+    .colbtn.electric {
+      animation: electricGlow 2s infinite alternate;
+    }
+
+    .gravity-btn.electric {
+      animation: electricGlow 2.5s infinite alternate;
+    }
+
+    /* Animation d'étincelles autour des boutons */
+    @keyframes buttonSparkles {
+      0% {
+        transform: rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Effet d'étincelles sur les boutons */
+    .colbtn::before, .gravity-btn::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, transparent, #00ffff, transparent, #ff00ff, transparent);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .colbtn:hover::before, .gravity-btn:hover::before {
+      opacity: 1;
+      animation: buttonSparkles 1.5s linear infinite;
+    }
+
+    /* ===== EFFET CONFETTIS DE VICTOIRE ===== */
+    
+    /* Animation de confettis */
+    @keyframes confetti {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #f39c12;
+      top: -10px;
+      animation: confetti 3s linear forwards;
+      z-index: 1000;
+      border-radius: 3px;
+    }
+
+    .confetti:nth-child(odd) {
+      background: #e74c3c;
+      width: 8px;
+      height: 8px;
+      animation-duration: 2.5s;
+    }
+
+    .confetti:nth-child(even) {
+      background: #3498db;
+      width: 6px;
+      height: 6px;
+      animation-duration: 3.5s;
+    }
+
+    .confetti.confetti-gold {
+      background: #f1c40f;
+      width: 12px;
+      height: 12px;
+    }
+
+    .confetti.confetti-purple {
+      background: #9b59b6;
+      width: 7px;
+      height: 7px;
+    }
+
+    .confetti.confetti-green {
+      background: #27ae60;
+      width: 9px;
+      height: 9px;
+    }
+
+    /* ===== EFFET NÉON BLANC POUR LE JOUEUR GAGNANT ===== */
+    
+    /* Animation de lueur néon blanche */
+    @keyframes whiteNeonGlow {
+      0%, 100% {
+        text-shadow: 
+          0 0 5px #ffffff,
+          0 0 10px #ffffff,
+          0 0 15px #ffffff,
+          0 0 20px #ffffff;
+        transform: scale(1);
+      }
+      50% {
+        text-shadow: 
+          0 0 10px #ffffff,
+          0 0 20px #ffffff,
+          0 0 30px #ffffff,
+          0 0 40px #ffffff,
+          0 0 50px #ffffff;
+        transform: scale(1.05);
+      }
+    }
+
+    /* Animation de bordure néon blanche */
+    @keyframes whiteNeonBorder {
+      0%, 100% {
+        box-shadow: 
+          0 0 5px #ffffff,
+          0 0 10px #ffffff,
+          0 0 15px #ffffff,
+          inset 0 0 5px rgba(255, 255, 255, 0.2);
+      }
+      50% {
+        box-shadow: 
+          0 0 15px #ffffff,
+          0 0 25px #ffffff,
+          0 0 35px #ffffff,
+          0 0 45px #ffffff,
+          inset 0 0 10px rgba(255, 255, 255, 0.4);
+      }
+    }
+
+    /* Classes pour le joueur gagnant */
+    .winner-player {
+      animation: whiteNeonGlow 1.5s ease-in-out infinite;
+      color: #ffffff !important;
+      font-weight: bold;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 2px solid #ffffff;
+    }
+
+    .winner-status {
+      animation: whiteNeonBorder 1.5s ease-in-out infinite;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+      border: 2px solid #ffffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    /* Effet néon sur les jetons du joueur gagnant */
+    .cell.winner-token {
+      animation: whiteNeonBorder 1.2s ease-in-out infinite;
+      transform: scale(1.1);
+      z-index: 10;
+      position: relative;
+    }
+
+    .cell.winner-token::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      box-shadow: 
+        0 0 10px #ffffff,
+        0 0 20px #ffffff,
+        0 0 30px #ffffff;
+      animation: whiteNeonBorder 1s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    /* ===== EFFETS POUR MATCH NUL ===== */
+    
+    /* Animation de lueur alternante pour match nul */
+    @keyframes drawGlow {
+      0%, 100% {
+        text-shadow: 
+          0 0 5px #ffff00,
+          0 0 10px #ffff00,
+          0 0 15px #ffff00;
+        color: #ffff00;
+      }
+      50% {
+        text-shadow: 
+          0 0 10px #ff8c00,
+          0 0 20px #ff8c00,
+          0 0 30px #ff8c00;
+        color: #ff8c00;
+      }
+    }
+
+    /* Animation pour les jetons lors d'un match nul */
+    @keyframes drawTokenGlow {
+      0%, 100% {
+        box-shadow: 
+          0 0 8px #ffff00,
+          0 0 15px #ffff00;
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 
+          0 0 15px #ff8c00,
+          0 0 25px #ff8c00,
+          0 0 35px #ff8c00;
+        transform: scale(1.05);
+      }
+    }
+
+    /* Classes pour le match nul */
+    .draw-status {
+      animation: drawGlow 2s ease-in-out infinite;
+      background: linear-gradient(45deg, rgba(255,255,0,0.1), rgba(255,140,0,0.1));
+      border: 2px solid #ffff00;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    .cell.draw-token {
+      animation: drawTokenGlow 1.8s ease-in-out infinite;
+      z-index: 5;
+      position: relative;
+    }
+
+    .cell.draw-token::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 50%;
+      border: 2px solid #ffff00;
+      box-shadow: 
+        0 0 8px #ffff00,
+        0 0 15px #ffff00;
+      animation: drawTokenGlow 1.5s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    /* ===== MESSAGE SPÉCIAL MATCH NUL ===== */
+    
+    /* Animation pour le message de match nul */
+    @keyframes drawMessageBounce {
+      0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.2) rotate(5deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes drawMessageGlow {
+      0%, 100% {
+        text-shadow: 
+          0 0 10px #ffff00,
+          0 0 20px #ffff00,
+          0 0 30px #ffff00;
+        box-shadow: 
+          0 0 15px rgba(255, 255, 0, 0.5),
+          0 0 30px rgba(255, 255, 0, 0.3);
+      }
+      50% {
+        text-shadow: 
+          0 0 15px #ff8c00,
+          0 0 30px #ff8c00,
+          0 0 45px #ff8c00;
+        box-shadow: 
+          0 0 25px rgba(255, 140, 0, 0.7),
+          0 0 50px rgba(255, 140, 0, 0.4);
+      }
+    }
+
+    /* Style pour le message de match nul */
+    .draw-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+      color: #ffff00;
+      font-size: 36px;
+      font-weight: bold;
+      padding: 20px 40px;
+      border: 4px solid #ffff00;
+      border-radius: 15px;
+      z-index: 10000;
+      text-align: center;
+      animation: drawMessageBounce 0.8s ease-out, drawMessageGlow 2s ease-in-out infinite 0.8s;
+      box-shadow: 
+        0 0 20px rgba(255, 255, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 0, 0.1);
+    }
+
+    .draw-message .draw-emoji {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 10px;
+      animation: drawMessageBounce 1s ease-out 0.3s;
+    }
+
+    .board-frame-neon {
+      background: rgba(8, 18, 45, 0.95);
+      border: 3px solid #00b4ff;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 
+        0 0 25px rgba(0, 180, 255, 0.5),
+        0 0 50px rgba(0, 180, 255, 0.25),
+        inset 0 0 25px rgba(0, 80, 160, 0.2);
+      position: relative;
+    }
+
+    .board-frame-neon::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff);
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0.7;
+      filter: blur(3px);
+    }
+
+    .board-inner-neon {
+      position: relative;
+    }
+
+    .neon-controls {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .neon-btn {
+      padding: 8px;
+      background: rgba(0, 180, 255, 0.2);
+      border: 2px solid #00b4ff;
+      border-radius: 8px;
+      color: #00ccff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+
+    .neon-btn:hover:not(:disabled) {
+      background: rgba(0, 180, 255, 0.4);
+      box-shadow: 0 0 15px rgba(0, 180, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .neon-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .game-grid-neon {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), var(--cell));
+      grid-template-rows: repeat(var(--rows), var(--cell));
+      gap: var(--gap);
+      background: rgba(12, 28, 65, 0.9);
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(0, 180, 255, 0.7);
+      box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.4);
+    }
+
+    .hole-neon {
+      width: var(--cell);
+      height: var(--cell);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, 
+        rgba(0, 120, 220, 0.15) 0%, 
+        rgba(8, 18, 45, 0.95) 60%, 
+        rgba(0, 40, 100, 0.8) 100%);
+      border: 2px solid #00b4ff;
+      box-shadow: 
+        0 0 12px rgba(0, 180, 255, 0.35),
+        inset 0 0 12px rgba(0, 60, 140, 0.5),
+        inset 0 3px 6px rgba(0, 180, 255, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .hole-neon::before {
+      content: '';
+      position: absolute;
+      width: calc(var(--cell) - 8px);
+      height: calc(var(--cell) - 8px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, 
+        rgba(0, 180, 255, 0.1) 0%, 
+        transparent 50%);
+      border: 1px solid rgba(0, 180, 255, 0.25);
+      pointer-events: none;
+    }
+
+    .hole-neon:hover:not(:disabled) {
+      box-shadow: 
+        0 0 18px rgba(0, 180, 255, 0.6),
+        inset 0 0 15px rgba(0, 100, 255, 0.4);
+      border-color: #00ccff;
+      transform: scale(1.05);
+    }
+
+    .token-p1-neon, .token-p2-neon {
+      width: calc(var(--cell) - 4px);
+      height: calc(var(--cell) - 4px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .board-base-neon {
+      width: 100%;
+      height: 35px;
+      background: linear-gradient(to bottom, 
+        rgba(0, 180, 255, 0.9) 0%, 
+        rgba(0, 140, 220, 1) 30%, 
+        rgba(0, 100, 180, 1) 100%);
+      border-radius: 0 0 14px 14px;
+      box-shadow: 
+        0 6px 16px rgba(0, 180, 255, 0.4),
+        inset 0 3px 6px rgba(255, 255, 255, 0.15);
+      border: 3px solid #00b4ff;
+      border-top: none;
+      margin-top: -2px;
+    }
+
+    .board-feet-neon {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 35px;
+      margin-top: -3px;
+    }
+
+    .board-foot-neon {
+      width: 40px;
+      height: 20px;
+      background: linear-gradient(to bottom, 
+        rgba(0, 140, 220, 1) 0%, 
+        rgba(0, 100, 180, 1) 100%);
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 12px rgba(0, 180, 255, 0.35);
+      border: 2px solid #00b4ff;
+      border-top: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="status">
+      {{if eq .Winner 0}}
+        <span>Tour du joueur {{.CurrentPlayer}}</span>
+        <!-- Chronomètre de tour (10s) -->
+        <span id="turn-timer" style="margin-left:12px;color:#ffd166;font-weight:700;">Temps restant: <span id="time-left">10</span>s</span>
+      {{else if eq .Winner -1}}
+        <span>🤝 Match nul ! Plateau plein</span>
+      {{else}}
+        <span>🎉 Victoire du joueur {{.Winner}} !</span>
+      {{end}}
+
+      <a class="link" href="/reset">Reset</a>
+
+      <!-- Contrôles de gravité -->
+      <div class="gravity-controls">
+        <span class="gravity-indicator">Gravité:</span>
+        <a href="/gravity?inverted=false" class="gravity-btn {{if not .InvertedGravity}}active{{end}}">
+          ⬇️ Normale
+        </a>
+        <a href="/gravity?inverted=true" class="gravity-btn {{if .InvertedGravity}}active{{end}}">
+          ⬆️ Inversée
+        </a>
+        {{if .InvertedGravity}}
+          <span class="gravity-indicator">Jetons tombent vers le HAUT!</span>
+        {{end}}
+      </div>
+
+      <form action="/new" method="get" class="sizes">
+        {{if .Debug}}<input type="hidden" name="debug" value="1">{{end}}
+        <button class="colbtn" type="submit" name="size" value="small">Small</button>
+        <button class="colbtn" type="submit" name="size" value="medium">Medium</button>
+        <button class="colbtn" type="submit" name="size" value="large">Large</button>
+      </form>
+    </div>
+
+    <div class="board">
+      {{if eq .BoardTemplate "board_small"}}
+        {{template "board_small" .}}
+      {{else if eq .BoardTemplate "board_large"}}
+        {{template "board_large" .}}
+      {{else}}
+        {{template "board_medium" .}}
+      {{end}}
+    </div>
+  </div>
+
+  <script>
+    // Fonction pour créer des confettis
+    function createConfetti() {
+      const colors = ['#f39c12', '#e74c3c', '#3498db', '#f1c40f', '#9b59b6', '#27ae60', '#e67e22', '#2ecc71'];
+      const confettiClasses = ['', 'confetti-gold', 'confetti-purple', 'confetti-green'];
+      
+      for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          const extraClass = confettiClasses[Math.floor(Math.random() * confettiClasses.length)];
+          
+          confetti.className = `confetti ${extraClass}`;
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 1 + 's';
+          
+          document.body.appendChild(confetti);
+          
+          // Supprimer le confetti après l'animation
+          setTimeout(() => {
+            if (confetti.parentNode) {
+              confetti.remove();
+            }
+          }, 4000);
+        }, i * 30);
+      }
+    }
+
+    // Variables globales pour la détection
+    let lastStatusText = '';
+    let confettiTriggered = false;
+    let winnerEffectActive = false;
+
+    // Fonction pour appliquer l'effet néon blanc au joueur gagnant
+    function applyWinnerNeonEffect(statusText) {
+      const status = document.querySelector('.status');
+      if (!status) return;
+      
+      // Détecter quel joueur a gagné
+      let winningPlayer = null;
+      let playerName = '';
+      if (statusText.includes('joueur 1') || statusText.includes('player 1') || statusText.includes('p1')) {
+        winningPlayer = 1;
+        playerName = 'Joueur 1';
+      } else if (statusText.includes('joueur 2') || statusText.includes('player 2') || statusText.includes('p2')) {
+        winningPlayer = 2;
+        playerName = 'Joueur 2';
+      }
+      
+      // Appliquer l'effet néon au message de statut
+      status.classList.add('winner-status');
+      
+      // Créer et afficher le message de victoire
+      if (winningPlayer) {
+        const winMessage = document.createElement('div');
+        winMessage.className = 'draw-message';
+        winMessage.style.color = '#ffffff';
+        winMessage.style.borderColor = '#ffffff';
+        winMessage.innerHTML = `
+          <span class="draw-emoji">🏆</span>
+          <div>${playerName} GAGNE !</div>
+          <div style="font-size: 18px; margin-top: 10px;">Félicitations !</div>
+        `;
+        document.body.appendChild(winMessage);
+        
+        // Appliquer l'effet néon aux jetons du joueur gagnant
+        const winnerTokens = document.querySelectorAll(`.cell.p${winningPlayer}`);
+        winnerTokens.forEach(token => {
+          token.classList.add('winner-token');
+        });
+        console.log(`✨ Effet néon blanc appliqué au ${playerName}`);
+        
+        // Retirer les effets après 8 secondes
+        setTimeout(() => {
+          status.classList.remove('winner-status');
+          document.querySelectorAll('.winner-token').forEach(token => {
+            token.classList.remove('winner-token');
+          });
+          if (winMessage.parentNode) {
+            winMessage.remove();
+          }
+          winnerEffectActive = false;
+          console.log('🔄 Effets néon retirés');
+        }, 8000);
+      }
+    }
+
+    // Fonction pour appliquer l'effet lors d'un match nul
+    function applyDrawEffect(statusText) {
+      const status = document.querySelector('.status');
+      if (!status) return;
+      
+      // Appliquer un effet spécial au message de match nul
+      status.classList.add('draw-status');
+      
+      // Créer et afficher le message de match nul
+      const drawMessage = document.createElement('div');
+      drawMessage.className = 'draw-message';
+      drawMessage.innerHTML = `
+        <span class="draw-emoji">🤝</span>
+        <div>MATCH NUL !</div>
+        <div style="font-size: 18px; margin-top: 10px;">Égalité parfaite</div>
+      `;
+      document.body.appendChild(drawMessage);
+      
+      // Faire briller tous les jetons avec un effet alternant
+      const allTokens = document.querySelectorAll('.cell.p1, .cell.p2');
+      allTokens.forEach((token, index) => {
+        setTimeout(() => {
+          token.classList.add('draw-token');
+        }, index * 100);
+      });
+      
+      console.log('🤝 Effet de match nul appliqué avec message');
+      
+      // Retirer les effets après 6 secondes
+      setTimeout(() => {
+        status.classList.remove('draw-status');
+        document.querySelectorAll('.draw-token').forEach(token => {
+          token.classList.remove('draw-token');
+        });
+        if (drawMessage.parentNode) {
+          drawMessage.remove();
+        }
+        console.log('🔄 Effets de match nul retirés');
+      }, 6000);
+    }
+
+    // Fonction améliorée pour détecter une victoire ou un match nul
+    function detectVictory() {
+      const status = document.querySelector('.status');
+      if (!status) return false;
+      
+      const currentText = status.textContent.toLowerCase();
+      
+      // Détecter différents messages de victoire possibles
+      const victoryKeywords = ['gagne', 'victoire', 'winner', 'win', 'gagné', 'remporte'];
+      const drawKeywords = ['match nul', 'égalité', 'draw', 'tie', 'nul', 'egalité'];
+      
+      const hasVictoryKeyword = victoryKeywords.some(keyword => currentText.includes(keyword));
+      const hasDrawKeyword = drawKeywords.some(keyword => currentText.includes(keyword));
+      
+      // Vérifier si le texte a changé et contient un mot-clé de fin de partie
+      if (currentText !== lastStatusText && (hasVictoryKeyword || hasDrawKeyword) && !confettiTriggered) {
+        
+        if (hasDrawKeyword) {
+          console.log('🤝 MATCH NUL DÉTECTÉ ! Déclenchement des confettis...');
+          confettiTriggered = true;
+          
+          // Déclencher les confettis pour le match nul
+          createConfetti();
+          
+          // Appliquer un effet spécial pour le match nul
+          applyDrawEffect(currentText);
+          
+        } else if (hasVictoryKeyword) {
+          console.log('🎉 VICTOIRE DÉTECTÉE ! Déclenchement des confettis et effet néon...');
+          confettiTriggered = true;
+          winnerEffectActive = true;
+          
+          // Déclencher les confettis
+          createConfetti();
+          
+          // Appliquer l'effet néon blanc au joueur gagnant
+          applyWinnerNeonEffect(currentText);
+        }
+        
+        // Réinitialiser après 5 secondes pour permettre une nouvelle partie
+        setTimeout(() => {
+          confettiTriggered = false;
+          console.log('✅ Prêt pour une nouvelle détection de fin de partie');
+        }, 5000);
+      }
+      
+      lastStatusText = currentText;
+    }
+
+    // Observer les changements de DOM pour une détection plus réactive
+    function setupVictoryObserver() {
+      const statusElement = document.querySelector('.status');
+      if (statusElement) {
+        // Observer les changements de contenu
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'childList' || mutation.type === 'characterData') {
+              detectVictory();
+            }
+          });
+        });
+        
+        observer.observe(statusElement, {
+          childList: true,
+          subtree: true,
+          characterData: true
+        });
+        
+        console.log('🔍 Observateur de victoire activé');
+      }
+    }
+
+    // Surveillance par intervalle comme solution de secours
+    setInterval(detectVictory, 200);
+
+
+
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Activer l'observateur de victoire
+      setupVictoryObserver();
+      
+      console.log('🚀 Système de confettis initialisé');
+    });
+  </script>
+
+  <script src="/static/js/physics.js"></script>
+
+  <!-- Script timer: démarre un chrono de 10s par tour et appelle /random_move si timeout -->
+  <script src="/static/js/timer.js"></script>
+
+</body>
+</html>
+{{end}}

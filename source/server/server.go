@@ -6,11 +6,12 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
 
-	"power4/game"
+	"github.com/Mebrouk-Mohammed/power4/source/game"
 )
 
 type viewData struct {
@@ -45,12 +46,12 @@ func NewDefault() *Server {
 	}
 
 	tpls := template.Must(template.New("").Funcs(fm).ParseFiles(
-		"templates/layout.gohtml",
-		"templates/board_small.gohtml",
-		"templates/board_medium.gohtml",
-		"templates/board_large.gohtml",
-		"templates/token_p1.gohtml",
-		"templates/token_p2.gohtml",
+		filepath.Join("templates", "logic_game", "layout.gohtml"),
+		filepath.Join("templates", "board", "board_small.gohtml"),
+		filepath.Join("templates", "board", "board_medium.gohtml"),
+		filepath.Join("templates", "board", "board_large.gohtml"),
+		filepath.Join("templates", "tokens", "token_p1.gohtml"),
+		filepath.Join("templates", "tokens", "token_p2.gohtml"),
 	))
 
 	g := game.New(6, 9) // medium par défaut

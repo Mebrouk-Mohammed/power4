@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"power4/auth"          // ⬅️ ajoute l'auth
-	"power4/source/server" // serveur du jeu
+	"github.com/Mebrouk-Mohammed/power4/source/auth"          // ⬅️ ajoute l'auth
+	"github.com/Mebrouk-Mohammed/power4/source/server" // serveur du jeu
 )
 
 func main() {

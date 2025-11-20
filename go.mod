@@ -1,4 +1,4 @@
-module power4
+module github.com/Mebrouk-Mohammed/power4
 
 go 1.23.0
 
