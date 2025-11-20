@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // --------- PROFIL ---------
@@ -26,7 +27,7 @@ type ProfileData struct {
 	Draws        int
 }
 
-// ProfileHandler : affiche le profil du joueur connecté
+// ProfileHandler : affiche (GET) et met à jour (POST) le profil du joueur connecté
 func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	username := currentUser(r)
 	if username == "" {
@@ -34,13 +35,53 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := context.Background()
+
+	// --- PARTIE MISE À JOUR (POST) ---
+	if r.Method == http.MethodPost {
+		if repo != nil {
+			_ = r.ParseForm()
+			email := strings.TrimSpace(r.FormValue("email"))
+			avatar := r.FormValue("avatar")
+
+			u, err := repo.GetByUsername(ctx, username)
+			if err != nil {
+				log.Printf("profile POST: GetByUsername error for '%s': %v", username, err)
+			}
+			if u != nil {
+				// Mise à jour de l'email en BDD (MySQL uniquement)
+				if email != "" {
+					if mr, ok := repo.(*mysqlRepo); ok {
+						if _, err := mr.db.ExecContext(ctx,
+							"UPDATE users SET email = ? WHERE id = ?",
+							email, u.ID,
+						); err != nil {
+							log.Printf("profile POST: update email error for '%s': %v", username, err)
+						}
+					}
+				}
+
+				// Mise à jour de l'avatar via le repo (MySQL + mémoire)
+				if avatar != "" {
+					if err := repo.UpdateAvatar(ctx, u.ID, avatar); err != nil {
+						log.Printf("profile POST: update avatar error for '%s': %v", username, err)
+					}
+				}
+			}
+		}
+
+		// On recharge la page en GET pour voir les changements
+		http.Redirect(w, r, "/profile", http.StatusSeeOther)
+		return
+	}
+
+	// --- PARTIE AFFICHAGE (GET) ---
+
 	data := ProfileData{
 		Username: username,
 		Avatar:   "/static/avatars/avatar1.png",
 		ELO:      1200,
 	}
-
-	ctx := context.Background()
 
 	if repo != nil {
 		// Récup info user (email, avatar, id…)
