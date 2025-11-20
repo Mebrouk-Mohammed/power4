@@ -1,0 +1,25 @@
+{{define "token_p1"}}
+  <!--
+    Template partiel "token_p1"
+    - Représente le jeton du Joueur 1 (orange)
+    - Utilisé à l'intérieur des différents plateaux (small / medium / large)
+    - Le parent (div ou bouton) contrôle la taille, ici on prend 100% de largeur/hauteur
+  -->
+  <div
+    class="token"
+    style="
+      /* Image du jeton orange utilisée comme fond */
+      background-image: url('/static/img/orange_token.png');
+      /* Le jeton occupe toute la largeur du conteneur parent */
+      width: 100%;
+      /* Le jeton occupe toute la hauteur du conteneur parent */
+      height: 100%;
+      /* On adapte l'image à la taille du conteneur en conservant les proportions */
+      background-size: contain;
+      /* On désactive la répétition de l'image */
+      background-repeat: no-repeat;
+      /* On centre l'image dans la case */
+      background-position: center;
+    "
+  ></div>
+{{end}}

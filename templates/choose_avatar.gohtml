@@ -1,0 +1,27 @@
+{{define "choose_avatar"}}
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Choisir avatar</title></head>
+<body>
+  <h1>Choisir un avatar</h1>
+  <form method="post" action="/choose_avatar">
+    <div>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar1.png"> <img src="/static/avatars/avatar1.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar2.png"> <img src="/static/avatars/avatar2.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar3.png"> <img src="/static/avatars/avatar3.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar4.png"> <img src="/static/avatars/avatar4.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar5.png"> <img src="/static/avatars/avatar5.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar6.png"> <img src="/static/avatars/avatar6.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar7.png"> <img src="/static/avatars/avatar7.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar8.png"> <img src="/static/avatars/avatar8.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar9.png"> <img src="/static/avatars/avatar9.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar10.png"> <img src="/static/avatars/avatar10.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar11.png"> <img src="/static/avatars/avatar11.png" width="80"></label>
+      <label><input type="radio" name="avatar" value="/static/avatars/avatar12.png"> <img src="/static/avatars/avatar12.png" width="80"></label>
+    </div>
+    <button type="submit">Enregistrer</button>
+  </form>
+  <a href="/profile">Retour</a>
+</body>
+</html>
+{{end}}

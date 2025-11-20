@@ -1,0 +1,325 @@
+{{define "board_medium"}}
+
+<!-- Bouton retour au menu (fixe en haut à gauche) -->
+<a href="/legacy" class="back-menu-medium">⬅ Retour au menu</a>
+
+<!-- Conteneur global du plateau en version medium avec effet néon -->
+<div class="board neon-board-medium">
+  <!-- Cadre principal du plateau -->
+  <div class="board-frame-neon-medium">
+    <!-- Zone interne du plateau, les variables CSS définissent la grille -->
+    <div class="board-inner-neon-medium"
+         style="--rows: {{.Rows}}; --cols: {{.Cols}};
+                --cell: 52px; --gap: 6px;">
+                
+      <!-- Formulaire principal pour jouer (envoi des coups sur /play) -->
+      <form action="/play" method="post">
+        <!-- Ligne de boutons de contrôle par colonne (flèches ▼ en haut) -->
+        <div class="controls neon-controls-medium">
+          <!-- Génère un bouton par colonne -->
+          {{range $c := rangeN .Cols}}
+            <!-- Bouton de sélection de colonne. Désactivé si la partie est terminée -->
+            <button class="colbtn neon-btn-medium" name="col" value="{{$c}}" {{if ne $.Winner 0}}disabled{{end}}>▼</button>
+          {{end}}
+        </div>
+
+        <!-- Grille principale de jeu : chaque bouton représente une case de la grille -->
+        <div class="game-grid-neon-medium">
+          <!-- Parcourt chaque ligne du plateau -->
+          {{range $i, $row := .Board}}
+            <!-- Parcourt chaque colonne de la ligne -->
+            {{range $j, $cell := $row}}
+              <!-- Cellule cliquable : joue dans la colonne correspondante -->
+              <button name="col" value="{{$j}}" type="submit" class="hole-neon-medium"
+                      {{if ne $.Winner 0}}disabled{{end}}>
+                <!-- Si la case appartient au joueur 1, affiche le jeton P1 -->
+                {{if eq $cell 1}}
+                  <div class="token-p1-neon-medium">{{template "token_p1" $}}</div>
+                <!-- Si la case appartient au joueur 2, affiche le jeton P2 -->
+                {{else if eq $cell 2}}
+                  <div class="token-p2-neon-medium">{{template "token_p2" $}}</div>
+                {{end}}
+              </button>
+            {{end}}
+          {{end}}
+        </div>
+      </form>
+    </div>
+
+    <!-- Base du plateau, sous la zone de jeu -->
+    <div class="board-base-neon-medium"></div>
+
+    <!-- Pieds du plateau (supports visuels) -->
+    <div class="board-feet-neon-medium">
+      <div class="board-foot-neon-medium"></div>
+      <div class="board-foot-neon-medium"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Bouton retour au menu, fixe en haut à gauche */
+.back-menu-medium {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(10, 14, 30, 0.92);
+  border: 1px solid #262b3a;
+  color: #ffa94d;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  z-index: 1000;
+}
+.back-menu-medium:hover {
+  background: rgba(18, 24, 50, 0.96);
+}
+
+/* Plateau néon bleu - Version Medium (taille intermédiaire) */
+.neon-board-medium {
+  background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%); /* Fond dégradé bleu/violet */
+  padding: 50px;                     /* Espace autour du plateau */
+  display: flex;                     /* Centre le contenu */
+  justify-content: center;           /* Centre horizontalement */
+  align-items: center;               /* Centre verticalement */
+  min-height: 700px;                 /* Hauteur minimale */
+}
+
+/* Cadre principal qui entoure la grille de jeu */
+.board-frame-neon-medium {
+  background: rgba(8, 18, 45, 0.95);          /* Fond bleu foncé semi-transparent */
+  border: 3px solid #00b4ff;                  /* Bordure néon bleue */
+  border-radius: 18px;                        /* Coins arrondis */
+  padding: 30px;                              /* Espace intérieur */
+  box-shadow: 
+    0 0 30px rgba(0, 180, 255, 0.5),         /* Halo externe */
+    0 0 60px rgba(0, 180, 255, 0.25),        /* Halo plus large */
+    inset 0 0 30px rgba(0, 80, 160, 0.2);    /* Lueur interne bleue */
+  position: relative;                        /* Nécessaire pour les pseudo-éléments */
+  transform: perspective(1000px) rotateX(3deg); /* Effet 3D léger (plateau incliné) */
+}
+
+/* Halo lumineux autour du cadre (couche supplémentaire) */
+.board-frame-neon-medium::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff, #00ccff); /* Dégradé néon */
+  border-radius: 22px;                /* Légèrement plus grand que le cadre */
+  z-index: -1;                        /* Derrière le cadre */
+  opacity: 0.7;                       /* Transparence pour un halo doux */
+  filter: blur(3px);                  /* Flou pour effet néon */
+}
+
+/* Conteneur interne qui regroupe les contrôles et la grille */
+.board-inner-neon-medium {
+  position: relative; /* Point de référence pour d'autres éléments internes */
+}
+
+/* Ligne des boutons de colonne (flèches de contrôle) */
+.neon-controls-medium {
+  display: grid;                                /* Grille pour aligner les boutons */
+  grid-template-columns: repeat(var(--cols), 1fr); /* Une colonne par colonne de jeu */
+  gap: 10px;                                    /* Espacement entre boutons */
+  margin-bottom: 25px;                          /* Espace sous la ligne de boutons */
+}
+
+/* Style des boutons de contrôle (flèches de colonnes) */
+.neon-btn-medium {
+  padding: 10px;                                /* Taille du bouton */
+  background: rgba(0, 180, 255, 0.2);          /* Fond légèrement bleu */
+  border: 2px solid #00b4ff;                   /* Bordure néon bleue */
+  border-radius: 10px;                         /* Coins arrondis */
+  color: #00ccff;                              /* Couleur du texte/flèche */
+  font-weight: 600;                            /* Texte en semi-gras */
+  cursor: pointer;                             /* Curseur main */
+  transition: all 0.3s ease;                   /* Transition douce au survol */
+  box-shadow: 0 0 12px rgba(0, 180, 255, 0.3); /* Légère lueur externe */
+  font-size: 14px;                             /* Taille du texte/flèche */
+}
+
+/* Effet visuel lorsqu'un bouton de colonne est survolé et actif */
+.neon-btn-medium:hover:not(:disabled) {
+  background: rgba(0, 180, 255, 0.4);         /* Fond plus lumineux */
+  box-shadow: 0 0 18px rgba(0, 180, 255, 0.5);/* Lueur plus intense */
+  transform: translateY(-3px);                /* Légère remontée visuelle */
+  border-color: #00ccff;                      /* Bordure plus claire */
+}
+
+/* Style des boutons lorsqu'ils sont désactivés (fin de partie) */
+.neon-btn-medium:disabled {
+  opacity: 0.4;             /* Bouton estompé */
+  cursor: not-allowed;      /* Indique que le bouton n'est plus cliquable */
+}
+
+/* Grille principale où sont placés les jetons */
+.game-grid-neon-medium {
+  display: grid;                                            /* Utilise une grille CSS */
+  grid-template-columns: repeat(var(--cols), var(--cell));  /* Colonnes de largeur fixe */
+  grid-template-rows: repeat(var(--rows), var(--cell));     /* Lignes de hauteur fixe */
+  gap: var(--gap);                                          /* Espace entre les cases */
+  background: rgba(12, 28, 65, 0.9);                        /* Fond sombre derrière les trous */
+  padding: 25px;                                            /* Espace intérieur */
+  border-radius: 15px;                                      /* Coins arrondis */
+  border: 2px solid rgba(0, 180, 255, 0.7);                 /* Bordure néon bleue */
+  box-shadow: inset 0 0 25px rgba(0, 50, 120, 0.4);         /* Ombre interne bleue */
+}
+
+/* Une case de la grille (trou du plateau) */
+.hole-neon-medium {
+  width: var(--cell);    /* Largeur de la case */
+  height: var(--cell);   /* Hauteur de la case */
+  border-radius: 50%;    /* Forme circulaire */
+  background: radial-gradient(circle at 35% 35%, 
+    rgba(0, 120, 220, 0.15) 0%, 
+    rgba(8, 18, 45, 0.95) 60%, 
+    rgba(0, 40, 100, 0.8) 100%); /* Effet de profondeur dans le trou */
+  border: 2px solid #00b4ff; /* Bordure néon bleue */
+  box-shadow: 
+    0 0 15px rgba(0, 180, 255, 0.35),        /* Halo externe */
+    inset 0 0 15px rgba(0, 60, 140, 0.5),    /* Halo interne bleu */
+    inset 0 4px 8px rgba(0, 180, 255, 0.2),  /* Reflet supérieur */
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6);     /* Ombre inférieure */
+  cursor: pointer;        /* La case est cliquable */
+  transition: all 0.25s ease; /* Animation fluide au survol */
+  display: flex;          /* Centre le contenu (jeton) */
+  align-items: center;    /* Centre verticalement */
+  justify-content: center;/* Centre horizontalement */
+  margin: 0;
+  padding: 0;
+  position: relative;     /* Nécessaire pour les pseudo-éléments */
+}
+
+/* Reflet interne sur la surface du trou */
+.hole-neon-medium::before {
+  content: '';
+  position: absolute;
+  width: calc(var(--cell) - 10px);  /* Cercle plus petit que la case */
+  height: calc(var(--cell) - 10px);
+  border-radius: 50%;              /* Cercle interne */
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(0, 180, 255, 0.1) 0%, 
+    transparent 50%);              /* Lueur claire en haut à gauche */
+  border: 1px solid rgba(0, 180, 255, 0.25); /* Bordure lumineuse légère */
+  pointer-events: none;            /* Ne bloque pas les clics */
+}
+
+/* Ombre interne dans le trou pour renforcer l'effet de profondeur */
+.hole-neon-medium::after {
+  content: '';
+  position: absolute;
+  width: calc(var(--cell) - 6px);   /* Légèrement plus grand que le cercle précédent */
+  height: calc(var(--cell) - 6px);
+  border-radius: 50%;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8); /* Ombre interne forte */
+  background: radial-gradient(circle at center, 
+    transparent 0%, 
+    rgba(0, 0, 0, 0.4) 70%);       /* Assombrissement vers le centre */
+  pointer-events: none;
+}
+
+/* Effet visuel lorsque l'on survole une case disponible */
+.hole-neon-medium:hover:not(:disabled) {
+  box-shadow: 
+    0 0 20px rgba(0, 180, 255, 0.6),
+    inset 0 0 18px rgba(0, 100, 255, 0.4); /* Plus de lueur interne bleue */
+  border-color: #00ccff;             /* Bordure plus claire */
+  transform: scale(1.05);            /* Case légèrement agrandie */
+}
+
+/* Jeton du joueur 1 ou 2 en version néon medium (conteneur) */
+.token-p1-neon-medium, .token-p2-neon-medium {
+  width: calc(var(--cell) - 4px);  /* Légèrement plus petit que la case */
+  height: calc(var(--cell) - 4px);
+  border-radius: 50%;             /* Forme circulaire */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 3;                     /* Au-dessus des effets d'ombre du trou */
+}
+
+/* Base du plateau (partie qui soutient le cadre) */
+.board-base-neon-medium {
+  width: 100%; /* Même largeur que le cadre */
+  height: 40px;
+  background: linear-gradient(to bottom, 
+    rgba(0, 180, 255, 0.9) 0%, 
+    rgba(0, 140, 220, 1) 30%, 
+    rgba(0, 100, 180, 1) 70%,
+    rgba(0, 80, 160, 1) 100%);    /* Dégradé vertical bleu */
+  border-radius: 0 0 16px 16px;   /* Coins arrondis en bas */
+  box-shadow: 
+    0 8px 20px rgba(0, 180, 255, 0.4),        /* Ombre externe */
+    inset 0 4px 8px rgba(255, 255, 255, 0.15),/* Reflet en haut */
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3);      /* Ombre en bas */
+  border: 3px solid #00b4ff;      /* Bordure néon */
+  border-top: none;               /* Pas de bordure en haut, collée au cadre */
+  margin-top: -2px;               /* Légère superposition avec le cadre */
+  position: relative;
+}
+
+/* Reflet lumineux horizontal sur la base */
+.board-base-neon-medium::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 15%;
+  right: 15%;
+  height: 4px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent);     /* Lueur blanche centrée */
+  border-radius: 2px;
+}
+
+/* Conteneur des deux pieds du plateau */
+.board-feet-neon-medium {
+  display: flex;
+  justify-content: space-between; /* Un pied à gauche, un à droite */
+  padding: 0 45px;                /* Décale les pieds vers l'intérieur */
+  margin-top: -3px;               /* Remonte légèrement sous la base */
+}
+
+/* Pieds du plateau (supports) */
+.board-foot-neon-medium {
+  width: 50px;  /* Largeur du pied */
+  height: 25px; /* Hauteur du pied */
+  background: linear-gradient(to bottom, 
+    rgba(0, 140, 220, 1) 0%, 
+    rgba(0, 100, 180, 1) 50%,
+    rgba(0, 80, 160, 1) 100%); /* Dégradé vertical bleu */
+  border-radius: 0 0 12px 12px;   /* Coins arrondis seulement en bas */
+  box-shadow: 
+    0 5px 15px rgba(0, 180, 255, 0.35),      /* Ombre externe */
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);/* Reflet interne */
+  border: 2px solid #00b4ff;      /* Bordure néon */
+  border-top: none;               /* Pas de bordure en haut */
+}
+
+/* Animation de pulsation néon pour le cadre medium */
+@keyframes neon-pulse-medium {
+  0%, 100% { 
+    box-shadow: 
+      0 0 30px rgba(0, 180, 255, 0.5),
+      0 0 60px rgba(0, 180, 255, 0.25); /* Lueur normale */
+  }
+  50% { 
+    box-shadow: 
+      0 0 40px rgba(0, 180, 255, 0.7),
+      0 0 80px rgba(0, 180, 255, 0.4);   /* Lueur plus forte à mi-cycle */
+  }
+}
+
+/* Lors du survol du cadre, on active la pulsation néon */
+.board-frame-neon-medium:hover {
+  animation: neon-pulse-medium 2s ease-in-out infinite;
+}
+</style>
+{{end}}

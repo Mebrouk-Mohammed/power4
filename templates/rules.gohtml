@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Règles du Puissance 4</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{--bg:#0f1115;--panel:#161a22;--text:#e8e8e8;--accent:#ffa94d;--border:#232839}
+
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,Arial,sans-serif;
+      margin:0;
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width:900px;
+      margin:0 auto;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:40px 20px;
+      box-sizing:border-box;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:28px 28px 24px;
+      box-sizing:border-box;
+      box-shadow:0 10px 32px rgba(0,0,0,.45);
+    }
+
+    h1{
+      margin:0 0 16px;
+      color:var(--accent);
+      text-align:center;
+      font-size:28px;
+    }
+
+    h2{
+      margin-top:18px;
+      font-size:18px;
+      color:#f5f5f5;
+    }
+
+    p,li{
+      font-size:15px;
+      line-height:1.6;
+      color:#d0d4dd;
+    }
+
+    ul{
+      padding-left:20px;
+      margin-top:6px;
+    }
+
+    .top-link{
+      margin-bottom:16px;
+    }
+
+    a.link{
+      color:var(--accent);
+      text-decoration:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-link">
+      <a href="/legacy" class="link">⬅️ Retour au menu</a>
+    </div>
+
+    <div class="card">
+      <h1>Règles du Puissance 4</h1>
+
+      <h2>Objectif du jeu</h2>
+      <p>
+        Le but est d’aligner <strong>4 pions de ta couleur</strong> avant ton adversaire :
+        horizontalement, verticalement ou en diagonale.
+      </p>
+
+      <h2>Mise en place</h2>
+      <ul>
+        <li>Le plateau est composé de <strong>7 colonnes</strong> et <strong>6 lignes</strong>.</li>
+        <li>Chaque joueur possède une couleur de pions (par exemple jaune et rouge).</li>
+        <li>Les joueurs jouent à tour de rôle.</li>
+      </ul>
+
+      <h2>Déroulement d’un tour</h2>
+      <ul>
+        <li>À ton tour, tu choisis une <strong>colonne</strong>.</li>
+        <li>Ton pion tombe dans la case libre la plus basse de cette colonne.</li>
+        <li>On vérifie alors si tu as aligné 4 pions.</li>
+      </ul>
+
+      <h2>Condition de victoire</h2>
+      <ul>
+        <li>Tu gagnes si tu alignes 4 de tes pions :</li>
+        <li>• sur une <strong>ligne horizontale</strong></li>
+        <li>• sur une <strong>colonne verticale</strong></li>
+        <li>• sur une <strong>diagonale</strong> (montante ou descendante)</li>
+      </ul>
+
+      <h2>Match nul</h2>
+      <p>
+        S’il n’y a plus de case libre sur le plateau et qu’aucun joueur n’a aligné 4 pions,
+        la partie est déclarée <strong>nulle</strong>.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{{define "token_p2"}}
+  <!--
+    Template partiel "token_p2"
+    - Représente le jeton du Joueur 2 (mauve / violet)
+    - Utilisé dans les différents plateaux (small / medium / large)
+    - Le parent (div ou bouton) fixe la taille, ici on prend 100% en largeur/hauteur
+  -->
+  <div
+    class="token"
+    style="
+      /* Image du jeton mauve utilisée comme fond */
+      background-image: url('/static/img/purple_token.png');
+      /* Le jeton prend toute la largeur de son conteneur parent */
+      width: 100%;
+      /* Le jeton prend toute la hauteur de son conteneur parent */
+      height: 100%;
+      /* L'image est ajustée dans le conteneur en gardant les proportions */
+      background-size: contain;
+      /* On évite que l'image se répète dans la case */
+      background-repeat: no-repeat;
+      /* On centre l'image du jeton dans son conteneur */
+      background-position: center;
+    "
+  ></div>
+{{end}}

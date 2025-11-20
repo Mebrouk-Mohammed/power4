@@ -1,0 +1,103 @@
+/* Plateau Connect 4 style néon bleu */
+.board-neon {
+  background: #0a0f2e;
+  padding: 30px;
+  border-radius: 20px;
+  position: relative;
+  box-shadow: 
+    0 0 30px rgba(0, 150, 255, 0.3),
+    inset 0 0 30px rgba(0, 100, 200, 0.1);
+  border: 2px solid #0096ff;
+}
+
+.board-neon::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #0096ff, #00d4ff, #0096ff);
+  border-radius: 22px;
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(1px);
+}
+
+/* Grille des cercles */
+.grid-neon {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 8px;
+  background: rgba(10, 20, 60, 0.8);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #0096ff;
+}
+
+/* Cercles individuels */
+.circle-neon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid #0096ff;
+  box-shadow: 
+    0 0 15px rgba(0, 150, 255, 0.4),
+    inset 0 0 15px rgba(0, 100, 200, 0.2);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.circle-neon::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.circle-neon:hover {
+  box-shadow: 
+    0 0 25px rgba(0, 150, 255, 0.6),
+    inset 0 0 20px rgba(0, 150, 255, 0.3);
+  border-color: #00d4ff;
+}
+
+/* Base du plateau */
+.board-base {
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(to bottom, #0096ff, #0066cc);
+  border-radius: 0 0 15px 15px;
+  box-shadow: 
+    0 5px 15px rgba(0, 150, 255, 0.4),
+    inset 0 2px 5px rgba(255, 255, 255, 0.1);
+  border: 1px solid #0096ff;
+  border-top: none;
+}
+
+/* Effets de lumière ambiante */
+body {
+  background: radial-gradient(ellipse at center, #0f1635 0%, #0a0f2e 70%, #050816 100%);
+  min-height: 100vh;
+}
+
+/* Animation optionnelle pour l'effet pulsation */
+@keyframes neon-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 15px rgba(0, 150, 255, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 25px rgba(0, 150, 255, 0.8);
+  }
+}
+
+.circle-neon.animate {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
