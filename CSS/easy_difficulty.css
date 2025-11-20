@@ -1,103 +1,103 @@
 /* Plateau Connect 4 style néon bleu */
 .board-neon {
-  background: #0a0f2e; /* Couleur de fond sombre du plateau */
-  padding: 30px; /* Espace intérieur autour de la grille */
-  border-radius: 20px; /* Bords arrondis */
-  position: relative; /* Nécessaire pour l'effet de bordure lumineuse */
+  background: #0a0f2e;
+  padding: 30px;
+  border-radius: 20px;
+  position: relative;
   box-shadow: 
-    0 0 30px rgba(0, 150, 255, 0.3), /* Lumière externe bleue */
-    inset 0 0 30px rgba(0, 100, 200, 0.1); /* Lumière interne */
-  border: 2px solid #0096ff; /* Bordure bleu néon */
+    0 0 30px rgba(0, 150, 255, 0.3),
+    inset 0 0 30px rgba(0, 100, 200, 0.1);
+  border: 2px solid #0096ff;
 }
 
 .board-neon::before {
-  content: ''; /* Élément décoratif */
-  position: absolute; /* Positionnement autour du plateau */
-  top: -2px; /* Légèrement plus grand que le plateau */
+  content: '';
+  position: absolute;
+  top: -2px;
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #0096ff, #00d4ff, #0096ff); /* Dégradé lumineux */
-  border-radius: 22px; /* Légèrement plus arrondi pour entourer le plateau */
-  z-index: -1; /* Derrière le plateau */
-  opacity: 0.7; /* Légère transparence */
-  filter: blur(1px); /* Effet lumineux */
+  background: linear-gradient(45deg, #0096ff, #00d4ff, #0096ff);
+  border-radius: 22px;
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(1px);
 }
 
 /* Grille des cercles */
 .grid-neon {
-  display: grid; /* Active le système de grille */
-  grid-template-columns: repeat(7, 1fr); /* 7 colonnes égales */
-  grid-template-rows: repeat(6, 1fr); /* 6 lignes égales */
-  gap: 8px; /* Espacement entre les cercles */
-  background: rgba(10, 20, 60, 0.8); /* Fond légèrement lumineux */
-  padding: 20px; /* Marges internes */
-  border-radius: 15px; /* Coins arrondis */
-  border: 1px solid #0096ff; /* Bordure bleue */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 8px;
+  background: rgba(10, 20, 60, 0.8);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #0096ff;
 }
 
 /* Cercles individuels */
 .circle-neon {
-  width: 60px; /* Taille des cercles */
+  width: 60px;
   height: 60px;
-  border-radius: 50%; /* Forme ronde */
-  background: rgba(0, 20, 50, 0.6); /* Fond sombre semi-transparent */
-  border: 2px solid #0096ff; /* Bordure bleue */
+  border-radius: 50%;
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid #0096ff;
   box-shadow: 
-    0 0 15px rgba(0, 150, 255, 0.4), /* Halo externe */
-    inset 0 0 15px rgba(0, 100, 200, 0.2); /* Halo interne */
-  position: relative; /* Nécessaire pour l'élément ::before */
-  cursor: pointer; /* Curseur cliquable */
-  transition: all 0.3s ease; /* Transition douce */
+    0 0 15px rgba(0, 150, 255, 0.4),
+    inset 0 0 15px rgba(0, 100, 200, 0.2);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .circle-neon::before {
-  content: ''; /* Cercle décoratif */
-  position: absolute; /* Placé à l'intérieur du cercle */
+  content: '';
+  position: absolute;
   top: 2px;
   left: 2px;
   right: 2px;
   bottom: 2px;
-  border-radius: 50%; /* Rond */
-  border: 1px solid rgba(0, 150, 255, 0.3); /* Petite lueur interne */
+  border-radius: 50%;
+  border: 1px solid rgba(0, 150, 255, 0.3);
 }
 
 .circle-neon:hover {
   box-shadow: 
-    0 0 25px rgba(0, 150, 255, 0.6), /* Lumière externe plus forte */
-    inset 0 0 20px rgba(0, 150, 255, 0.3); /* Lumière interne plus forte */
-  border-color: #00d4ff; /* Bordure plus claire au survol */
+    0 0 25px rgba(0, 150, 255, 0.6),
+    inset 0 0 20px rgba(0, 150, 255, 0.3);
+  border-color: #00d4ff;
 }
 
 /* Base du plateau */
 .board-base {
-  width: 100%; /* Largeur complète */
-  height: 40px; /* Hauteur fixe */
-  background: linear-gradient(to bottom, #0096ff, #0066cc); /* Dégradé bleu */
-  border-radius: 0 0 15px 15px; /* Arrondi en bas */
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(to bottom, #0096ff, #0066cc);
+  border-radius: 0 0 15px 15px;
   box-shadow: 
-    0 5px 15px rgba(0, 150, 255, 0.4), /* Ombre externe */
-    inset 0 2px 5px rgba(255, 255, 255, 0.1); /* Éclairage interne */
-  border: 1px solid #0096ff; /* Bordure bleue */
-  border-top: none; /* Pas de bordure supérieure */
+    0 5px 15px rgba(0, 150, 255, 0.4),
+    inset 0 2px 5px rgba(255, 255, 255, 0.1);
+  border: 1px solid #0096ff;
+  border-top: none;
 }
 
 /* Effets de lumière ambiante */
 body {
-  background: radial-gradient(ellipse at center, #0f1635 0%, #0a0f2e 70%, #050816 100%); /* Fond sombre lumineux */
-  min-height: 100vh; /* Hauteur minimum = hauteur de l’écran */
+  background: radial-gradient(ellipse at center, #0f1635 0%, #0a0f2e 70%, #050816 100%);
+  min-height: 100vh;
 }
 
-/* Animation optionnelle pour effet de pulsation */
+/* Animation optionnelle pour l'effet pulsation */
 @keyframes neon-pulse {
   0%, 100% { 
-    box-shadow: 0 0 15px rgba(0, 150, 255, 0.4); /* Lumière faible */
+    box-shadow: 0 0 15px rgba(0, 150, 255, 0.4);
   }
   50% { 
-    box-shadow: 0 0 25px rgba(0, 150, 255, 0.8); /* Lumière forte */
+    box-shadow: 0 0 25px rgba(0, 150, 255, 0.8);
   }
 }
 
 .circle-neon.animate {
-  animation: neon-pulse 2s ease-in-out infinite; /* Applique la pulsation en boucle */
+  animation: neon-pulse 2s ease-in-out infinite;
 }

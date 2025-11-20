@@ -1,4 +1,8 @@
 {{define "board_small"}}
+
+<!-- Bouton retour au menu (fixe en haut à gauche) -->
+<a href="/legacy" class="back-menu-small">⬅ Retour au menu</a>
+
 <!-- Conteneur global du plateau en version small avec effet néon -->
 <div class="neon-board">
   <!-- Cadre principal du plateau -->
@@ -12,26 +16,18 @@
       <form action="/play" method="post">
         <!-- Ligne de boutons de contrôle (flèches pour chaque colonne) -->
         <div class="neon-controls">
-          <!-- Un bouton par colonne -->
           {{range $c := rangeN .Cols}}
-            <!-- Bouton pour jouer dans la colonne $c. Désactivé si la partie est terminée -->
             <button class="neon-btn" name="col" value="{{$c}}" {{if ne $.Winner 0}}disabled{{end}}>▼</button>
           {{end}}
         </div>
 
-        <!-- Grille principale de jeu (chaque bouton est une case) -->
         <div class="game-grid-neon">
-          <!-- Parcours des lignes du plateau -->
           {{range $i, $row := .Board}}
-            <!-- Parcours des colonnes de la ligne -->
             {{range $j, $cell := $row}}
-              <!-- Cellule cliquable : si on clique, on joue dans la colonne $j -->
               <button name="col" value="{{$j}}" type="submit" class="hole-neon"
                       {{if ne $.Winner 0}}disabled{{end}}>
-                <!-- Si la case appartient au joueur 1, on affiche son jeton -->
                 {{if eq $cell 1}}
                   <div class="token-p1-neon">{{template "token_p1" $}}</div>
-                <!-- Si la case appartient au joueur 2, on affiche son jeton -->
                 {{else if eq $cell 2}}
                   <div class="token-p2-neon">{{template "token_p2" $}}</div>
                 {{end}}
@@ -42,10 +38,8 @@
       </form>
     </div>
 
-    <!-- Base du plateau, sous la zone de jeu -->
     <div class="board-base-neon"></div>
 
-    <!-- Pieds du plateau (supports visuels) -->
     <div class="board-feet-neon">
       <div class="board-foot-neon"></div>
       <div class="board-foot-neon"></div>
@@ -54,30 +48,47 @@
 </div>
 
 <style>
+
+.back-menu-small {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(10, 14, 30, 0.92);
+  border: 1px solid #262b3a;
+  color: #ffa94d;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  z-index: 1000;
+}
+.back-menu-small:hover {
+  background: rgba(18, 24, 50, 0.96);
+}
+
 /* Plateau néon bleu - Version Small */
 .neon-board {
-  background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%); /* Fond dégradé */
-  padding: 40px;                 /* Place autour du plateau */
-  display: flex;                 /* Centre le contenu */
-  justify-content: center;       /* Centre horizontalement */
-  align-items: center;           /* Centre verticalement */
-  min-height: 600px;             /* Hauteur minimale */
+  background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%);
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 600px;
 }
 
-/* Cadre principal du plateau */
 .board-frame-neon {
-  background: rgba(8, 18, 45, 0.95);          /* Fond bleu foncé */
-  border: 3px solid #00b4ff;                  /* Bordure néon bleue */
-  border-radius: 16px;                        /* Coins arrondis */
-  padding: 25px;                              /* Espace intérieur */
+  background: rgba(8, 18, 45, 0.95);
+  border: 3px solid #00b4ff;
+  border-radius: 16px;
+  padding: 25px;
   box-shadow: 
-    0 0 25px rgba(0, 180, 255, 0.5),         /* Halo externe */
-    0 0 50px rgba(0, 180, 255, 0.25),        /* Halo plus large */
-    inset 0 0 25px rgba(0, 80, 160, 0.2);    /* Lueur interne bleue */
-  position: relative;                         /* Pour les pseudo-éléments */
+    0 0 25px rgba(0, 180, 255, 0.5),
+    0 0 50px rgba(0, 180, 255, 0.25),
+    inset 0 0 25px rgba(0, 80, 160, 0.2);
+  position: relative;
 }
 
-/* Halo lumineux autour du cadre */
 .board-frame-neon::before {
   content: '';
   position: absolute;
@@ -85,160 +96,127 @@
   left: -4px;
   right: -4px;
   bottom: -4px;
-  background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff); /* Dégradé néon */
-  border-radius: 20px;            /* Légèrement plus grand que le cadre */
-  z-index: -1;                    /* Derrière le cadre */
-  opacity: 0.7;                   /* Transparence pour un halo doux */
-  filter: blur(3px);              /* Flou pour l'effet néon */
+  background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(3px);
 }
 
-/* Conteneur interne de la grille et des contrôles */
-.board-inner-neon {
-  position: relative; /* Point de référence pour l'intérieur du plateau */
-}
+.board-inner-neon { position: relative; }
 
-/* Ligne de boutons de contrôle (flèches par colonne) */
 .neon-controls {
-  display: grid;                              /* Grille pour aligner les boutons */
-  grid-template-columns: repeat(var(--cols), 1fr); /* Une colonne par colonne de jeu */
-  gap: 8px;                                   /* Espace entre les boutons */
-  margin-bottom: 20px;                        /* Espace avec la grille de jeu */
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
-/* Bouton de sélection de colonne (flèche) */
 .neon-btn {
-  padding: 8px;                                /* Taille du bouton */
-  background: rgba(0, 180, 255, 0.2);         /* Fond bleu doux */
-  border: 2px solid #00b4ff;                  /* Bordure néon */
-  border-radius: 8px;                          /* Coins arrondis */
-  color: #00ccff;                              /* Couleur de la flèche */
-  font-weight: 600;                            /* Texte semi-gras */
-  cursor: pointer;                             /* Curseur main */
-  transition: all 0.3s ease;                   /* Transition au survol */
-  box-shadow: 0 0 10px rgba(0, 180, 255, 0.3); /* Légère lueur externe */
+  padding: 8px;
+  background: rgba(0, 180, 255, 0.2);
+  border: 2px solid #00b4ff;
+  border-radius: 8px;
+  color: #00ccff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
 }
-
-/* Effet au survol des boutons de colonne (quand ils sont actifs) */
 .neon-btn:hover:not(:disabled) {
-  background: rgba(0, 180, 255, 0.4);         /* Fond plus lumineux */
-  box-shadow: 0 0 15px rgba(0, 180, 255, 0.5);/* Lueur plus intense */
-  transform: translateY(-2px);                /* Léger "saut" visuel */
+  background: rgba(0, 180, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 180, 255, 0.5);
+  transform: translateY(-2px);
 }
-
-/* Aspect des boutons désactivés (fin de partie) */
 .neon-btn:disabled {
-  opacity: 0.4;            /* Bouton estompé */
-  cursor: not-allowed;     /* Indique qu'on ne peut plus cliquer */
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-/* Grille principale des cases du jeu */
 .game-grid-neon {
-  display: grid;                                           /* Utilise une grille CSS */
-  grid-template-columns: repeat(var(--cols), var(--cell)); /* Colonnes de taille fixe */
-  grid-template-rows: repeat(var(--rows), var(--cell));    /* Lignes de taille fixe */
-  gap: var(--gap);                                         /* Espace entre les cases */
-  background: rgba(12, 28, 65, 0.9);                       /* Fond sombre derrière les trous */
-  padding: 20px;                                           /* Espace intérieur */
-  border-radius: 12px;                                     /* Coins arrondis */
-  border: 2px solid rgba(0, 180, 255, 0.7);                /* Bordure néon */
-  box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.4);        /* Ombre interne bleue */
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-template-rows: repeat(var(--rows), var(--cell));
+  gap: var(--gap);
+  background: rgba(12, 28, 65, 0.9);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 180, 255, 0.7);
+  box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.4);
 }
 
-/* Une case du plateau (trou où peut tomber un jeton) */
 .hole-neon {
-  width: var(--cell);   /* Largeur de la case */
-  height: var(--cell);  /* Hauteur de la case */
-  border-radius: 50%;   /* Forme circulaire */
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, 
     rgba(0, 120, 220, 0.15) 0%, 
     rgba(8, 18, 45, 0.95) 60%, 
-    rgba(0, 40, 100, 0.8) 100%); /* Effet de volume dans le trou */
-  border: 2px solid #00b4ff; /* Bordure néon bleue */
-  box-shadow: 
-    0 0 12px rgba(0, 180, 255, 0.35),       /* Lueur externe */
-    inset 0 0 12px rgba(0, 60, 140, 0.5),   /* Lueur interne bleue */
-    inset 0 3px 6px rgba(0, 180, 255, 0.2), /* Reflet en haut */
-    inset 0 -2px 4px rgba(0, 0, 0, 0.6);    /* Ombre en bas */
-  cursor: pointer;       /* Case cliquable */
-  transition: all 0.25s ease; /* Transition au survol */
-  display: flex;         /* Centre le jeton à l'intérieur */
-  align-items: center;   /* Centre verticalement */
-  justify-content: center;/* Centre horizontalement */
-  margin: 0;
-  padding: 0;
-}
-
-/* Reflet interne dans le trou pour accentuer l'effet de profondeur */
-.hole-neon::before {
-  content: '';
-  position: absolute;
-  width: calc(var(--cell) - 8px);   /* Légèrement plus petit que la case */
-  height: calc(var(--cell) - 8px);
-  border-radius: 50%;              /* Cercle interne */
-  background: radial-gradient(circle at 30% 30%, 
-    rgba(0, 180, 255, 0.1) 0%, 
-    transparent 50%);              /* Lueur claire dans une zone */
-  border: 1px solid rgba(0, 180, 255, 0.25); /* Bordure lumineuse légère */
-  pointer-events: none;            /* Ne bloque pas les clics */
-}
-
-/* Effet visuel quand on survole une case disponible */
-.hole-neon:hover:not(:disabled) {
-  box-shadow: 
-    0 0 18px rgba(0, 180, 255, 0.6),
-    inset 0 0 15px rgba(0, 100, 255, 0.4); /* Lueur plus forte */
-  border-color: #00ccff;          /* Bordure plus claire */
-  transform: scale(1.05);         /* Case légèrement agrandie */
-}
-
-/* Conteneur visuel des jetons pour les deux joueurs */
-.token-p1-neon, .token-p2-neon {
-  width: calc(var(--cell) - 4px);  /* Légèrement plus petit que le trou */
-  height: calc(var(--cell) - 4px);
-  border-radius: 50%;              /* Forme circulaire */
+    rgba(0, 40, 100, 0.8) 100%);
+  border: 2px solid #00b4ff;
+  box-shadow:
+    0 0 12px rgba(0, 180, 255, 0.35),
+    inset 0 0 12px rgba(0, 60, 140, 0.5),
+    inset 0 3px 6px rgba(0, 180, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 2;                      /* Au-dessus des ombres internes */
+}
+.hole-neon:hover:not(:disabled) {
+  box-shadow:
+    0 0 18px rgba(0, 180, 255, 0.6),
+    inset 0 0 15px rgba(0, 100, 255, 0.4);
+  border-color: #00ccff;
+  transform: scale(1.05);
 }
 
-/* Base du plateau (partie sur laquelle repose le cadre) */
+.token-p1-neon, .token-p2-neon {
+  width: calc(var(--cell) - 4px);
+  height: calc(var(--cell) - 4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .board-base-neon {
-  width: 100%; /* Largeur identique au cadre */
+  width: 100%;
   height: 35px;
   background: linear-gradient(to bottom, 
     rgba(0, 180, 255, 0.9) 0%, 
     rgba(0, 140, 220, 1) 30%, 
-    rgba(0, 100, 180, 1) 100%);    /* Dégradé bleu vertical */
-  border-radius: 0 0 14px 14px;    /* Coins arrondis uniquement en bas */
-  box-shadow: 
-    0 6px 16px rgba(0, 180, 255, 0.4),        /* Ombre externe */
-    inset 0 3px 6px rgba(255, 255, 255, 0.15);/* Reflet interne */
-  border: 3px solid #00b4ff;       /* Bordure néon */
-  border-top: none;                /* Pas de bordure en haut */
-  margin-top: -2px;                /* Légère superposition avec le cadre */
+    rgba(0, 100, 180, 1) 100%);
+  border-radius: 0 0 14px 14px;
+  box-shadow:
+    0 6px 16px rgba(0, 180, 255, 0.4),
+    inset 0 3px 6px rgba(255, 255, 255, 0.15);
+  border: 3px solid #00b4ff;
+  border-top: none;
+  margin-top: -2px;
 }
 
-/* Conteneur des pieds du plateau (supports) */
 .board-feet-neon {
   display: flex;
-  justify-content: space-between; /* Un pied à gauche, un à droite */
-  padding: 0 35px;                /* Décale les pieds vers l'intérieur */
-  margin-top: -3px;               /* Remonte légèrement sous la base */
+  justify-content: space-between;
+  padding: 0 35px;
+  margin-top: -3px;
 }
 
-/* Pieds du plateau (supports visuels) */
 .board-foot-neon {
-  width: 40px;  /* Largeur du pied */
-  height: 20px; /* Hauteur du pied */
+  width: 40px;
+  height: 20px;
   background: linear-gradient(to bottom, 
     rgba(0, 140, 220, 1) 0%, 
-    rgba(0, 100, 180, 1) 100%); /* Dégradé bleu */
-  border-radius: 0 0 10px 10px;   /* Coins arrondis en bas */
-  box-shadow: 0 4px 12px rgba(0, 180, 255, 0.35); /* Ombre externe */
-  border: 2px solid #00b4ff;      /* Bordure néon */
-  border-top: none;               /* Pas de bordure en haut */
+    rgba(0, 100, 180, 1) 100%);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 12px rgba(0, 180, 255, 0.35);
+  border: 2px solid #00b4ff;
+  border-top: none;
 }
+
 </style>
+
 {{end}}

@@ -1,4 +1,7 @@
 {{define "board_large"}}
+<!-- Lien retour menu principal -->
+<a href="/legacy" class="back-menu-large">⬅ Retour au menu</a>
+
 <!-- Conteneur global du plateau en version large avec effet néon -->
 <div class="board neon-board-large">
   <!-- Cadre principal du plateau avec contours néon -->
@@ -56,6 +59,25 @@
 </div>
 
 <style>
+/* Bouton retour menu, fixe en haut à gauche */
+.back-menu-large {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(10, 14, 30, 0.92);
+  border: 1px solid #262b3a;
+  color: #ffa94d;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  z-index: 1000;
+}
+.back-menu-large:hover {
+  background: rgba(18, 24, 50, 0.96);
+}
+
 /* Plateau néon bleu - Version Large (mode avancé) */
 .neon-board-large {
   background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%); /* Fond dégradé bleu/violet */

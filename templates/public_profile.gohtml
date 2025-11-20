@@ -1,0 +1,15 @@
+{{define "public_profile"}}
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Profil public - {{.Username}}</title></head>
+<body>
+  <h1>Profil public de {{.Username}}</h1>
+  <img src="{{.Avatar}}" alt="avatar" width="120">
+  <p>Email: {{if .Email}}{{.Email}}{{else}}—{{end}}</p>
+  <p>ELO: {{.ELO}}</p>
+  <p>Parties jouées: {{.GamesPlayed}}</p>
+  <p>Victoires: {{.Wins}}</p>
+  <a href="/">Retour</a>
+</body>
+</html>
+{{end}}
