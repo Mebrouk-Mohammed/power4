@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- Document HTML5 -->
+<html lang="fr">
+<head>
+  <!-- Encodage UTF-8 -->
+  <meta charset="UTF-8">
+
+  <!-- Titre affiché dans l'onglet du navigateur -->
+  <title>Accueil Puissance 4</title>
+
+  <style>
+    /* Styles généraux de la page */
+    body {
+      font-family: 'Segoe UI', sans-serif;               /* Police moderne */
+      background: linear-gradient(to right, #ffecd2, #fcb69f); /* Dégradé pastel */
+      display: flex;                                     /* Centre la boîte principale */
+      justify-content: center;
+      align-items: center;
+      height: 100vh;                                     /* Prend toute la hauteur */
+      margin: 0;                                         /* Supprime les marges */
+    }
+
+    /* Boîte centrale */
+    .container {
+      background: white;                                 /* Fond blanc */
+      padding: 40px;                                     /* Espacement interne */
+      border-radius: 12px;                               /* Coins arrondis */
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);             /* Ombre légère */
+      text-align: center;                                /* Centre le contenu */
+      width: 400px;                                      /* Largeur fixe */
+    }
+
+    /* Titre principal */
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Boutons (liens stylés) */
+    a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: #fcb69f;                         /* Couleur bouton */
+      color: white;                                      /* Texte blanc */
+      text-decoration: none;                             /* Supprime le soulignement */
+      border-radius: 6px;                                /* Coins arrondis */
+      font-weight: bold;
+      transition: background-color 0.3s ease;            /* Animation hover */
+    }
+
+    /* Effet hover sur les boutons */
+    a:hover {
+      background-color: #ff9a8b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Conteneur principal centré -->
+  <div class="container">
+
+    <!-- Bloc affiché si une variable . (nom d’utilisateur) est fournie -->
+    {{if .}}
+      <!-- Message personnalisé pour l’utilisateur connecté -->
+      <h1>Bienvenue {{.}} sur notre Puissance 4 en ligne !</h1>
+
+      <!-- Bouton pour accéder à la partie -->
+      <a href="/game">Lancer une partie</a>
+
+    <!-- Sinon, bloc affiché pour utilisateurs non connectés -->
+    {{else}}
+      <h1>Bienvenue sur notre Puissance 4 en ligne !</h1>
+
+      <!-- Boutons d'inscription et de connexion -->
+      <a href="/register">Créer un compte</a>
+      <a href="/login">Se connecter</a>
+    {{end}}
+
+  </div>
+</body>
+</html>

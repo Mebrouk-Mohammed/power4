@@ -1,178 +1,178 @@
 /* Container principal avec arrière-plan dégradé */
 .connect4-board {
-  background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  font-family: 'Arial', sans-serif;
+  background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%); /* Dégradé sombre bleu */
+  min-height: 100vh; /* Hauteur minimum = hauteur de l'écran */
+  display: flex; /* Centre le contenu */
+  justify-content: center; /* Centre horizontalement */
+  align-items: center; /* Centre verticalement */
+  padding: 40px; /* Espacement autour */
+  font-family: 'Arial', sans-serif; /* Police du plateau */
 }
 
 /* Structure principale du plateau */
 .board-container {
-  position: relative;
-  perspective: 1000px;
+  position: relative; /* Nécessaire pour les effets 3D */
+  perspective: 1000px; /* Profondeur 3D */
 }
 
 /* Cadre principal avec effet néon */
 .board-frame {
-  background: rgba(8, 18, 45, 0.95);
-  border: 3px solid #00b4ff;
-  border-radius: 16px;
-  padding: 30px 35px 25px 35px;
+  background: rgba(8, 18, 45, 0.95); /* Fond bleu sombre */
+  border: 3px solid #00b4ff; /* Bordure néon */
+  border-radius: 16px; /* Coins arrondis */
+  padding: 30px 35px 25px 35px; /* Espacements internes */
   box-shadow: 
-    0 0 25px rgba(0, 180, 255, 0.5),
-    0 0 50px rgba(0, 180, 255, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 0 25px rgba(0, 80, 160, 0.2);
-  position: relative;
-  transform: rotateX(2deg);
+    0 0 25px rgba(0, 180, 255, 0.5), /* Halo externe */
+    0 0 50px rgba(0, 180, 255, 0.25), /* Halo plus diffus */
+    0 8px 32px rgba(0, 0, 0, 0.4), /* Ombre en dessous */
+    inset 0 0 25px rgba(0, 80, 160, 0.2); /* Lumière interne */
+  position: relative; /* Nécessaire pour ::before */
+  transform: rotateX(2deg); /* Léger effet 3D incliné */
 }
 
-/* Effet de lueur externe */
+/* Effet de lueur externe autour du cadre */
 .board-frame::before {
-  content: '';
-  position: absolute;
-  top: -4px;
+  content: ''; /* Élément décoratif */
+  position: absolute; /* Position fixe autour du cadre */
+  top: -4px; 
   left: -4px;
   right: -4px;
   bottom: -4px;
-  background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff, #00ccff);
-  border-radius: 20px;
-  z-index: -1;
-  opacity: 0.7;
-  filter: blur(3px);
+  background: linear-gradient(45deg, #00b4ff, #0099dd, #00b4ff, #00ccff); /* Dégradé lumineux */
+  border-radius: 20px; /* Légèrement plus arrondi */
+  z-index: -1; /* Derrière le cadre */
+  opacity: 0.7; /* Transparence */
+  filter: blur(3px); /* Flou lumineux */
 }
 
-/* Grille des trous - 7 rangées × 9 colonnes */
+/* Grille des trous - 7 lignes × 9 colonnes */
 .game-grid {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(7, 1fr);
-  gap: 8px;
-  background: rgba(12, 28, 65, 0.9);
-  padding: 22px;
-  border-radius: 12px;
-  border: 2px solid rgba(0, 180, 255, 0.7);
-  box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.4);
+  display: grid; /* Active la grille */
+  grid-template-columns: repeat(9, 1fr); /* 9 colonnes */
+  grid-template-rows: repeat(7, 1fr); /* 7 lignes */
+  gap: 8px; /* Espacement entre les trous */
+  background: rgba(12, 28, 65, 0.9); /* Fond bleu foncé */
+  padding: 22px; /* Marges internes */
+  border-radius: 12px; /* Coins arrondis */
+  border: 2px solid rgba(0, 180, 255, 0.7); /* Bordure néon */
+  box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.4); /* Lumière interne */
 }
 
-/* Trous individuels */
+/* Trous individuels (emplacements des jetons) */
 .hole {
-  width: 48px;
+  width: 48px; /* Taille des trous */
   height: 48px;
-  border-radius: 50%;
+  border-radius: 50%; /* Forme ronde */
   background: radial-gradient(circle at 35% 35%, 
     rgba(0, 120, 220, 0.15) 0%, 
     rgba(8, 18, 45, 0.95) 60%, 
-    rgba(0, 40, 100, 0.8) 100%);
-  border: 2px solid #00b4ff;
+    rgba(0, 40, 100, 0.8) 100%); /* Dégradé pour effet de profondeur */
+  border: 2px solid #00b4ff; /* Bordure lumineuse */
   box-shadow: 
-    0 0 12px rgba(0, 180, 255, 0.35),
-    inset 0 0 12px rgba(0, 60, 140, 0.5),
-    inset 0 3px 6px rgba(0, 180, 255, 0.2),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
-  position: relative;
-  cursor: pointer;
-  transition: all 0.25s ease;
+    0 0 12px rgba(0, 180, 255, 0.35), /* Halo externe */
+    inset 0 0 12px rgba(0, 60, 140, 0.5), /* Halo interne */
+    inset 0 3px 6px rgba(0, 180, 255, 0.2), /* Lueur douce */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6); /* Ombre interne */
+  position: relative; /* Nécessaire pour ::before et ::after */
+  cursor: pointer; /* Indique que c'est cliquable */
+  transition: all 0.25s ease; /* Animation fluide */
 }
 
-/* Effet de profondeur interne */
+/* Effet interne lumineux */
 .hole::before {
-  content: '';
+  content: ''; /* Élément décoratif */
   position: absolute;
-  top: 4px;
+  top: 4px; 
   left: 4px;
   right: 4px;
   bottom: 4px;
-  border-radius: 50%;
+  border-radius: 50%; /* Forme ronde */
   background: radial-gradient(circle at 30% 30%, 
     rgba(0, 180, 255, 0.1) 0%, 
-    transparent 50%);
-  border: 1px solid rgba(0, 180, 255, 0.25);
+    transparent 50%); /* Reflet interne */
+  border: 1px solid rgba(0, 180, 255, 0.25); /* Bordure subtile */
 }
 
-/* Ombre interne profonde */
+/* Ombre interne profonde pour simuler un vrai trou */
 .hole::after {
   content: '';
   position: absolute;
-  top: 2px;
+  top: 2px; 
   left: 2px;
   right: 2px;
   bottom: 2px;
   border-radius: 50%;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8); /* Ombre centrale */
   background: radial-gradient(circle at center, 
     transparent 0%, 
-    rgba(0, 0, 0, 0.3) 70%);
+    rgba(0, 0, 0, 0.3) 70%); /* Assombrissement progressif */
 }
 
-/* Effet hover */
+/* Effet au survol du trou */
 .hole:hover {
   box-shadow: 
-    0 0 18px rgba(0, 180, 255, 0.6),
-    inset 0 0 15px rgba(0, 100, 255, 0.4);
-  border-color: #00ccff;
-  transform: scale(1.03);
+    0 0 18px rgba(0, 180, 255, 0.6), /* Halo plus intense */
+    inset 0 0 15px rgba(0, 100, 255, 0.4); /* Lumière interne renforcée */
+  border-color: #00ccff; /* Bordure plus claire */
+  transform: scale(1.03); /* Légère mise en avant */
 }
 
 /* Base du plateau */
 .board-base {
-  width: 100%;
-  height: 38px;
+  width: 100%; /* Largeur complète */
+  height: 38px; /* Hauteur */
   background: linear-gradient(to bottom, 
     rgba(0, 180, 255, 0.9) 0%, 
     rgba(0, 140, 220, 1) 30%, 
     rgba(0, 100, 180, 1) 70%,
-    rgba(0, 80, 160, 1) 100%);
-  border-radius: 0 0 14px 14px;
+    rgba(0, 80, 160, 1) 100%); /* Dégradé vertical */
+  border-radius: 0 0 14px 14px; /* Arrondi en bas */
   box-shadow: 
-    0 6px 16px rgba(0, 180, 255, 0.4),
-    inset 0 3px 6px rgba(255, 255, 255, 0.15),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.4);
-  border: 3px solid #00b4ff;
-  border-top: none;
-  position: relative;
-  margin-top: -2px;
+    0 6px 16px rgba(0, 180, 255, 0.4), /* Lueur externe */
+    inset 0 3px 6px rgba(255, 255, 255, 0.15), /* Reflet haut */
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4); /* Ombre basse */
+  border: 3px solid #00b4ff; /* Bordure néon */
+  border-top: none; /* Pas de bordure haut */
+  position: relative; /* Nécessaire pour ::before */
+  margin-top: -2px; /* Ajustement visuel */
 }
 
-/* Reflet sur la base */
+/* Reflet lumineux sur la base */
 .board-base::before {
   content: '';
   position: absolute;
-  top: 2px;
+  top: 2px; 
   left: 15%;
   right: 15%;
   height: 3px;
   background: linear-gradient(to right, 
     transparent, 
     rgba(255, 255, 255, 0.4), 
-    transparent);
+    transparent); /* Reflet horizontal */
   border-radius: 2px;
 }
 
 /* Pieds du plateau */
 .board-feet {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 40px;
-  margin-top: -3px;
+  display: flex; /* Pieds alignés */
+  justify-content: space-between; /* Un à gauche, un à droite */
+  padding: 0 40px; /* Espacement horizontal */
+  margin-top: -3px; /* Petit ajustement */
 }
 
 .board-foot {
-  width: 45px;
-  height: 22px;
+  width: 45px; /* Largeur du pied */
+  height: 22px; /* Hauteur */
   background: linear-gradient(to bottom, 
     rgba(0, 140, 220, 1) 0%, 
     rgba(0, 100, 180, 1) 50%,
-    rgba(0, 80, 160, 1) 100%);
-  border-radius: 0 0 10px 10px;
+    rgba(0, 80, 160, 1) 100%); /* Dégradé vertical */
+  border-radius: 0 0 10px 10px; /* Arrondi bas */
   box-shadow: 
-    0 4px 12px rgba(0, 180, 255, 0.35),
-    inset 0 1px 3px rgba(255, 255, 255, 0.2);
-  border: 2px solid #00b4ff;
-  border-top: none;
+    0 4px 12px rgba(0, 180, 255, 0.35), /* Ombre externe */
+    inset 0 1px 3px rgba(255, 255, 255, 0.2); /* Reflet interne */
+  border: 2px solid #00b4ff; /* Bordure néon */
+  border-top: none; /* Pas de bordure haut */
 }
 
 /* Animation de pulsation néon */
@@ -180,32 +180,33 @@
   0%, 100% { 
     box-shadow: 
       0 0 25px rgba(0, 180, 255, 0.5),
-      0 0 50px rgba(0, 180, 255, 0.25);
+      0 0 50px rgba(0, 180, 255, 0.25); /* Lueur normale */
   }
   50% { 
     box-shadow: 
       0 0 35px rgba(0, 180, 255, 0.7),
-      0 0 70px rgba(0, 180, 255, 0.4);
+      0 0 70px rgba(0, 180, 255, 0.4); /* Lueur plus forte */
   }
 }
 
+/* Classe à appliquer pour activer la pulsation */
 .board-frame.glow {
-  animation: neon-pulse 2.5s ease-in-out infinite;
+  animation: neon-pulse 2.5s ease-in-out infinite; /* Animation continue */
 }
 
-/* Responsive */
+/* Responsive pour tablettes et petits écrans */
 @media (max-width: 768px) {
   .hole {
-    width: 38px;
+    width: 38px; /* Trou plus petit */
     height: 38px;
   }
   
   .game-grid {
-    gap: 6px;
+    gap: 6px; /* Espacement réduit */
     padding: 18px;
   }
   
   .board-frame {
-    padding: 25px 30px 20px 30px;
+    padding: 25px 30px 20px 30px; /* Cadre plus compact */
   }
 }

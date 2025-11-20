@@ -1,11 +1,25 @@
 {{define "token_p1"}}
-<<<<<<< HEAD
-<div class="token" style="background-image:url('/static/img/orange_token.png'); width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat;"></div>
+  <!--
+    Template partiel "token_p1"
+    - Représente le jeton du Joueur 1 (orange)
+    - Utilisé à l'intérieur des différents plateaux (small / medium / large)
+    - Le parent (div ou bouton) contrôle la taille, ici on prend 100% de largeur/hauteur
+  -->
+  <div
+    class="token"
+    style="
+      /* Image du jeton orange utilisée comme fond */
+      background-image: url('/static/img/orange_token.png');
+      /* Le jeton occupe toute la largeur du conteneur parent */
+      width: 100%;
+      /* Le jeton occupe toute la hauteur du conteneur parent */
+      height: 100%;
+      /* On adapte l'image à la taille du conteneur en conservant les proportions */
+      background-size: contain;
+      /* On désactive la répétition de l'image */
+      background-repeat: no-repeat;
+      /* On centre l'image dans la case */
+      background-position: center;
+    "
+  ></div>
 {{end}}
-=======
-<span class="token token-p1" style="
-  display:inline-block;width:26px;height:26px;line-height:26px;
-  text-align:center;border-radius:50%;background:#ffa94d;color:#111;font-weight:700;
-">●</span>
-{{end}}
->>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17

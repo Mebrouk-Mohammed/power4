@@ -1,11 +1,25 @@
 {{define "token_p2"}}
-<<<<<<< HEAD
-<div class="token" style="background-image: url('/static/img/purple_token.png'); width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat;"></div>
+  <!--
+    Template partiel "token_p2"
+    - Représente le jeton du Joueur 2 (mauve / violet)
+    - Utilisé dans les différents plateaux (small / medium / large)
+    - Le parent (div ou bouton) fixe la taille, ici on prend 100% en largeur/hauteur
+  -->
+  <div
+    class="token"
+    style="
+      /* Image du jeton mauve utilisée comme fond */
+      background-image: url('/static/img/purple_token.png');
+      /* Le jeton prend toute la largeur de son conteneur parent */
+      width: 100%;
+      /* Le jeton prend toute la hauteur de son conteneur parent */
+      height: 100%;
+      /* L'image est ajustée dans le conteneur en gardant les proportions */
+      background-size: contain;
+      /* On évite que l'image se répète dans la case */
+      background-repeat: no-repeat;
+      /* On centre l'image du jeton dans son conteneur */
+      background-position: center;
+    "
+  ></div>
 {{end}}
-=======
-<span class="token token-p2" style="
-  display:inline-block;width:26px;height:26px;line-height:26px;
-  text-align:center;border-radius:50%;background:#6ea8ff;color:#111;font-weight:700;
-">●</span>
-{{end}}
->>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17

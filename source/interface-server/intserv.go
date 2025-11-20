@@ -1,163 +1,167 @@
-package main
+package main // Déclare le package principal (point d'entrée du programme)
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
+	"encoding/json" // Pour encoder/décoder du JSON
+	"fmt"           // Pour afficher du texte dans la console et écrire dans la réponse
+	"log"           // Pour gérer les logs et erreurs serveur
+	"net/http"      // Pour créer le serveur HTTP
 )
 
 const (
-	// Constantes du jeu
-	Rows    = 6
-	Columns = 7
-	Empty   = 0
-	Player1 = 1
-	Player2 = 2
+	Rows    = 6 // Nombre de lignes du plateau
+	Columns = 7 // Nombre de colonnes du plateau
+	Empty   = 0 // Case vide
+	Player1 = 1 // Joueur 1
+	Player2 = 2 // Joueur 2
 )
 
+// Board représente l'état du jeu côté serveur
 type Board struct {
-	// Représente le plateau de jeu
-	Cells         [Rows][Columns]int `json:"cells"`
-	CurrentPlayer int                `json:"currentPlayer"`
-	Winner        int                `json:"winner"`
-	GameOver      bool               `json:"gameOver"`
-	Message       string             `json:"message"`
+	Cells         [Rows][Columns]int `json:"cells"`         // Grille de jeu (6x7)
+	CurrentPlayer int                `json:"currentPlayer"` // Joueur courant (1 ou 2)
+	Winner        int                `json:"winner"`        // Gagnant (0 = aucun, 1 ou 2, ou autre si match nul)
+	GameOver      bool               `json:"gameOver"`      // Indique si la partie est terminée
+	Message       string             `json:"message"`       // Message d'information pour le joueur
 }
 
-var gameBoard Board
+var gameBoard Board // Variable globale qui contient l'état du plateau
 
+// Reset réinitialise la partie
 func (b *Board) Reset() {
-	// Réinitialise le plateau de jeu
-	for r := 0; r < Rows; r++ {
-		for c := 0; c < Columns; c++ {
-			b.Cells[r][c] = Empty
+	for r := 0; r < Rows; r++ { // Parcourt chaque ligne
+		for c := 0; c < Columns; c++ { // Parcourt chaque colonne
+			b.Cells[r][c] = Empty // Vide chaque case
 		}
 	}
-	b.CurrentPlayer = Player1
-	b.Winner = 0
-	b.GameOver = false
-	b.Message = "Joueur 1 (orange) commence"
+	b.CurrentPlayer = Player1                // Le joueur 1 commence
+	b.Winner = 0                             // Pas de gagnant
+	b.GameOver = false                       // La partie n'est pas terminée
+	b.Message = "Joueur 1 (orange) commence" // Message initial affiché au joueur
 }
 
+// Drop fait tomber un jeton dans la colonne donnée
 func (b *Board) Drop(col int) (int, bool) {
-	// Place un jeton dans la colonne spécifiée
-	if b.GameOver {
-		return -1, false
+	if b.GameOver { // Si la partie est déjà terminée
+		return -1, false // On refuse le coup
 	}
 
-	for r := Rows - 1; r >= 0; r-- {
-		// Cherche la première case vide
-		if b.Cells[r][col] == Empty {
-			b.Cells[r][col] = b.CurrentPlayer
+	for r := Rows - 1; r >= 0; r-- { // On part du bas et on remonte
+		if b.Cells[r][col] == Empty { // Si la case est vide
+			b.Cells[r][col] = b.CurrentPlayer // Place le jeton du joueur courant
 
-			// Vérifier victoire
+			// Vérifier si ce coup provoque une victoire
 			if b.checkWin(r, col) {
-				b.Winner = b.CurrentPlayer
-				b.GameOver = true
+				b.Winner = b.CurrentPlayer // On enregistre le gagnant
+				b.GameOver = true          // On marque la partie comme finie
 				if b.CurrentPlayer == Player1 {
-					b.Message = "Joueur 1 (Orange) gagne !"
+					b.Message = "Joueur 1 (Orange) gagne !" // Message de victoire joueur 1
 				} else {
-					b.Message = "Joueur 2 (Mauve) gagne !"
+					b.Message = "Joueur 2 (Mauve) gagne !" // Message de victoire joueur 2
 				}
-			} else if b.isBoardFull() {
-				b.GameOver = true
-				b.Message = "Match nul !"
+			} else if b.isBoardFull() { // Si le plateau est plein
+				b.GameOver = true         // La partie est finie
+				b.Message = "Match nul !" // Message de match nul
 			} else {
-				// Changer de joueur
+				// Sinon on change de joueur
 				if b.CurrentPlayer == Player1 {
-					b.CurrentPlayer = Player2
-					b.Message = "Tour: Joueur 2 (Mauve)"
+					b.CurrentPlayer = Player2            // Passage au joueur 2
+					b.Message = "Tour: Joueur 2 (Mauve)" // Message de tour
 				} else {
-					b.CurrentPlayer = Player1
-					b.Message = "Tour: Joueur 1 (Orange)"
+					b.CurrentPlayer = Player1             // Retour au joueur 1
+					b.Message = "Tour: Joueur 1 (Orange)" // Message de tour
 				}
 			}
-			return r, true
+			return r, true // On renvoie la ligne où le jeton est tombé et true
 		}
 	}
-	return -1, false
+	return -1, false // Si aucune case libre dans la colonne, coup impossible
 }
 
+// checkWin vérifie si le dernier coup joué gagne la partie
 func (b *Board) checkWin(row, col int) bool {
-	player := b.Cells[row][col]
+	player := b.Cells[row][col] // Récupère le joueur ayant joué ce coup
 
-	// Vérifications: horizontal, vertical, diagonales
+	// Liste des directions : horizontale, verticale, diagonale ↘, diagonale ↗
 	directions := [][2]int{{0, 1}, {1, 0}, {1, 1}, {1, -1}}
 
-	for _, dir := range directions {
-		count := 1
+	for _, dir := range directions { // Pour chaque direction
+		count := 1 // On compte déjà le jeton posé
 
-		// Vérifier dans une direction
-		for i := 1; i < 4; i++ {
-			r, c := row+dir[0]*i, col+dir[1]*i
+		// Vérifier dans une direction (avant)
+		for i := 1; i < 4; i++ { // On regarde au maximum 3 cases plus loin
+			r, c := row+dir[0]*i, col+dir[1]*i // Nouvelle position à vérifier
 			if r >= 0 && r < Rows && c >= 0 && c < Columns && b.Cells[r][c] == player {
-				count++
+				count++ // Même joueur trouvé, on augmente le compteur
 			} else {
-				break
+				break // Si ce n'est plus le même joueur ou hors plateau, on arrête
 			}
 		}
 
-		// Vérifier dans l'autre direction
-		for i := 1; i < 4; i++ {
+		// Vérifier dans l'autre direction (arrière)
+		for i := 1; i < 4; i++ { // Même logique dans le sens opposé
 			r, c := row-dir[0]*i, col-dir[1]*i
 			if r >= 0 && r < Rows && c >= 0 && c < Columns && b.Cells[r][c] == player {
-				count++
+				count++ // Même joueur dans l'autre sens
 			} else {
-				break
+				break // On arrête si plus aligné
 			}
 		}
 
-		if count >= 4 {
-			return true
+		if count >= 4 { // Si on a au moins 4 jetons alignés
+			return true // Il y a une victoire
 		}
 	}
-	return false
+	return false // Aucun alignement gagnant trouvé
 }
 
+// isBoardFull vérifie si le plateau est plein
 func (b *Board) isBoardFull() bool {
-	for c := 0; c < Columns; c++ {
-		if b.Cells[0][c] == Empty {
-			return false
+	for c := 0; c < Columns; c++ { // On parcourt chaque colonne
+		if b.Cells[0][c] == Empty { // Si la première ligne contient une case vide
+			return false // Le plateau n'est pas plein
 		}
 	}
-	return true
+	return true // Si aucune case vide en haut, le plateau est plein
 }
 
+// stateHandler renvoie l'état actuel du jeu en JSON
 func stateHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gameBoard)
+	w.Header().Set("Content-Type", "application/json") // Indique qu'on renvoie du JSON
+	json.NewEncoder(w).Encode(gameBoard)               // Encode l'état du jeu en JSON et l'envoie
 }
 
+// dropHandler reçoit une colonne en JSON, joue le coup, et renvoie le nouvel état
 func dropHandler(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Column int `json:"column"`
+		Column int `json:"column"` // Structure pour récupérer la colonne envoyée par le client
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil { // Décode la requête JSON
+		http.Error(w, "Invalid JSON", http.StatusBadRequest) // Renvoie une erreur si JSON invalide
 		return
 	}
 
-	if req.Column < 0 || req.Column >= Columns {
-		http.Error(w, "Invalid column", http.StatusBadRequest)
+	if req.Column < 0 || req.Column >= Columns { // Vérifie que la colonne demandée est valide
+		http.Error(w, "Invalid column", http.StatusBadRequest) // Erreur si colonne incorrecte
 		return
 	}
 
-	gameBoard.Drop(req.Column)
+	gameBoard.Drop(req.Column) // Joue le coup sur le plateau
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gameBoard)
+	w.Header().Set("Content-Type", "application/json") // Réponse en JSON
+	json.NewEncoder(w).Encode(gameBoard)               // Renvoie le nouvel état de jeu
 }
 
+// resetHandler réinitialise la partie et renvoie le nouvel état
 func resetHandler(w http.ResponseWriter, r *http.Request) {
-	gameBoard.Reset()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gameBoard)
+	gameBoard.Reset()                                  // Réinitialise le plateau
+	w.Header().Set("Content-Type", "application/json") // Réponse au format JSON
+	json.NewEncoder(w).Encode(gameBoard)               // Envoie l'état réinitialisé
 }
 
-// 🎮 PAGE DE JEU AVEC PLATEAU ET JETONS
+// gameHandler renvoie la page HTML principale du jeu (plateau + jetons)
 func gameHandler(w http.ResponseWriter, r *http.Request) {
+	// tmpl contient tout le HTML, CSS et JavaScript de la page de jeu
 	tmpl := `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -325,12 +329,13 @@ func gameHandler(w http.ResponseWriter, r *http.Request) {
   </script>
 </body>
 </html>`
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, tmpl)
+	w.Header().Set("Content-Type", "text/html") // Indique qu'on renvoie de l'HTML
+	fmt.Fprint(w, tmpl)                         // Écrit le template dans la réponse
 }
 
-// 🖼️ FONCTION POUR AFFICHER LA PAGE WEB AVEC VOS IMAGES
+// webGameHandler renvoie la page d'accueil HTML
 func webGameHandler(w http.ResponseWriter, r *http.Request) {
+	// tmpl contient le HTML/CSS de la page d'accueil
 	tmpl := `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -393,31 +398,32 @@ func webGameHandler(w http.ResponseWriter, r *http.Request) {
     <a href="/game">Lancer une partie</a>
   </div>
 </html>`
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, tmpl)
+	w.Header().Set("Content-Type", "text/html") // Réponse en HTML
+	fmt.Fprint(w, tmpl)                         // Envoie le HTML au navigateur
 }
 
+// main est le point d'entrée du programme
 func main() {
-	// Initialiser le jeu
+	// Initialiser l'état du jeu au démarrage
 	gameBoard.Reset()
 
-	// PAGE PRINCIPALE AVEC VOS IMAGES
+	// Route pour la page d'accueil
 	http.HandleFunc("/", webGameHandler)
 
-	// PAGE DE JEU AVEC PLATEAU ET JETONS
+	// Route pour la page de jeu (plateau + interaction)
 	http.HandleFunc("/game", gameHandler)
 
-	//  SERVIR VOS IMAGES DEPUIS LE DOSSIER assets/
+	// Route pour servir les fichiers du dossier assets/ (images)
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("../../assets/"))))
 
-	// APIs du jeu
-	http.HandleFunc("/api/state", stateHandler)
-	http.HandleFunc("/api/drop", dropHandler)
-	http.HandleFunc("/api/reset", resetHandler)
+	// Routes de l'API pour l'état, les coups et le reset
+	http.HandleFunc("/api/state", stateHandler) // Récupérer l'état du jeu
+	http.HandleFunc("/api/drop", dropHandler)   // Jouer un coup
+	http.HandleFunc("/api/reset", resetHandler) // Réinitialiser la partie
 
-	fmt.Println("🎮 Serveur Puissance 4 démarré sur http://localhost:8080")
-	fmt.Println("📱 Ouvrez votre navigateur à cette adresse pour jouer !")
-	fmt.Println("🖼️ Images servies depuis : ./assets/picture/")
+	fmt.Println("Serveur Puissance 4 démarré sur http://localhost:8080") // Message console
+	fmt.Println("Ouvrez votre navigateur à cette adresse pour jouer !")  // Indication à l'utilisateur
+	fmt.Println("Images servies depuis : ./assets/picture/")             // Info sur le dossier d'images
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil)) // Lance le serveur HTTP sur le port 8080 et log en cas d'erreur
 }

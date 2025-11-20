@@ -1,167 +1,292 @@
 {{define "layout"}}
 <!doctype html>
+<!--
+  Template principal "layout" : structure complète de la page HTML
+  - Contient : <head> (styles globaux) + <body> (status, plateau, scripts)
+-->
 <html lang="fr">
 <head>
-<<<<<<< HEAD
-     <meta charset="utf-8">
-  <title>Power4</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root { --cell: 58px; --gap: 1px; --pad: 15px; --offx: 85px; --offy: 95px; --imgW: 720px; }
-=======
+  <!-- Encodage UTF-8 pour gérer correctement les caractères accentués -->
   <meta charset="utf-8">
-  <title>Puissance 4 — Jeu</title>
+  <!-- Titre de la page dans l'onglet du navigateur -->
+  <title>Power4</title>
+  <!-- Meta pour un affichage responsive sur mobile / tablette -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
-    :root { --cell: 64px; --gap: 12px; }
-    html,body{margin:0;padding:0;background:#0b1020;color:#f1faee;font-family:system-ui,Segoe UI,Arial}
-    .wrap{max-width:1100px;margin:32px auto;padding:16px}
->>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
-
-    /* mini-nav haut avec surbrillance légère */
-    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-    .nav a{
-      display:inline-block;padding:8px 12px;border-radius:10px;
-      border:1px solid #2a355a;background:#141e38;color:#a8dadc;text-decoration:none;
-      transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
-    }
-    .nav a:hover, .nav a:focus-visible{
-      background:#213055;color:#e9fbff;transform:translateY(-1px);
-      box-shadow:0 0 0 2px #a8dadc33, 0 8px 18px #0008; outline:none;
+    /* ------------------------------------------------------------------
+       VARIABLES GLOBALES CSS POUR LE PLATEAU CLASSIQUE
+       ------------------------------------------------------------------ */
+    :root {
+      --cell: 58px;   /* Taille d'une case (diamètre d'un trou) */
+      --gap: 1px;     /* Espace entre les cases dans la grille classique */
+      --pad: 15px;    /* Padding interne autour de la grille classique */
+      --offx: 85px;   /* Décalage horizontal de l'image de fond classique */
+      --offy: 95px;   /* Décalage vertical de l'image de fond classique */
+      --imgW: 720px;  /* Largeur de l'image de fond classique */
     }
 
-    .status{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-<<<<<<< HEAD
-    .link{color:#a8dadc}
+    /* ------------------------------------------------------------------
+       STYLE GLOBAL DE LA PAGE
+       ------------------------------------------------------------------ */
+    body {
+      font-family: system-ui; /* Police par défaut lisible partout */
+      background: #0b1020;   /* Fond sombre pour mettre en valeur le plateau */
+      color: #f1faee;        /* Couleur du texte principale (clair) */
+      margin: 0;             /* Supprime les marges par défaut du navigateur */
+    }
 
-    .sizes{display:flex;gap:8px;margin-left:8px}
-    .colbtn{
-      padding:8px;
-      border-radius:8px;
-      border:2px solid #00ffff;
-      background:linear-gradient(145deg, #152348, #1a2854);
-      color:#00ffff;
-      font-weight:600;
-      cursor:pointer;
-      position:relative;
-      overflow:hidden;
-      text-shadow:0 0 10px #00ffff;
+    /* Conteneur principal centré qui contient le status + le plateau */
+    .wrap {
+      max-width: 1100px;     /* Largeur maximale de la zone de jeu */
+      margin: 40px auto;     /* Centre horizontalement et ajoute un espace en haut/bas */
+      padding: 16px;         /* Petit padding intérieur */
+    }
+
+    /* ------------------------------------------------------------------
+       BARRE DE STATUT (INFO PARTIE + BOUTONS)
+       ------------------------------------------------------------------ */
+    .status {
+      display: flex;         /* Aligne les éléments sur une ligne */
+      align-items: center;   /* Centre verticalement les éléments */
+      gap: 12px;             /* Espace entre chaque élément de statut */
+      margin-bottom: 14px;   /* Espace entre statut et plateau */
+      flex-wrap: wrap;       /* Permet le retour à la ligne sur petits écrans */
+    }
+
+    /* Style basique des liens (ex: Reset) dans la barre de statut */
+    .link {
+      color: #a8dadc;
+    }
+
+    /* ------------------------------------------------------------------
+       SELECTEUR DE TAILLE DE PLATEAU (SMALL / MEDIUM / LARGE)
+       ------------------------------------------------------------------ */
+    .sizes {
+      display: flex;         /* Aligne les boutons sur une ligne */
+      gap: 8px;              /* Espace entre chaque bouton */
+      margin-left: 8px;      /* Décale les boutons légèrement vers la droite */
+    }
+
+    /* Boutons de sélection de taille et certains boutons d'action (style néon) */
+    .colbtn {
+      padding: 8px;                                                  /* Espacement interne du texte */
+      border-radius: 8px;                                            /* Coins arrondis */
+      border: 2px solid #00ffff;                                     /* Bordure de base turquoise */
+      background: linear-gradient(145deg, #152348, #1a2854);         /* Dégradé de fond bleu foncé */
+      color: #00ffff;                                                /* Texte turquoise */
+      font-weight: 600;                                              /* Texte un peu plus gras */
+      cursor: pointer;                                               /* Curseur main */
+      position: relative;                                            /* Pour les effets ::before */
+      overflow: hidden;                                              /* Cache les débordements d'effets */
+      text-shadow: 0 0 10px #00ffff;                                 /* Lueur autour du texte */
       box-shadow:
         0 0 10px rgba(0, 255, 255, 0.5),
-        inset 0 0 10px rgba(0, 255, 255, 0.1);
-      transition:all 0.3s ease;
+        inset 0 0 10px rgba(0, 255, 255, 0.1);                       /* Lueur interne et externe */
+      transition: all 0.3s ease;                                     /* Transition douce sur le hover */
     }
-    .colbtn:hover{
-      border-color:#ff00ff;
-      color:#ff00ff;
-      text-shadow:0 0 15px #ff00ff;
+
+    /* Effet visuel lorsqu'on survole le bouton de taille */
+    .colbtn:hover {
+      border-color: #ff00ff;                                         /* Change la couleur de bordure au survol */
+      color: #ff00ff;                                                /* Change la couleur du texte */
+      text-shadow: 0 0 15px #ff00ff;                                 /* Lueur rose plus forte */
       box-shadow:
         0 0 20px rgba(255, 0, 255, 0.7),
         0 0 40px rgba(255, 0, 255, 0.4),
-        inset 0 0 15px rgba(255, 0, 255, 0.2);
-      transform:translateY(-2px);
+        inset 0 0 15px rgba(255, 0, 255, 0.2);                       /* Lueur plus intense */
+      transform: translateY(-2px);                                   /* Léger déplacement vers le haut */
     }
-    .colbtn:active{
-      transform:translateY(0);
+
+    /* Effet lorsque le bouton est enfoncé (clic) */
+    .colbtn:active {
+      transform: translateY(0);                                      /* Retour à la position de base */
       box-shadow:
         0 0 15px rgba(0, 255, 255, 0.8),
-        inset 0 0 20px rgba(0, 255, 255, 0.3);
-    }
-    .colbtn:disabled{
-      opacity:.4;
-      cursor:not-allowed;
-      border-color:#666;
-      color:#666;
-      text-shadow:none;
-      box-shadow:none;
-      transform:none;
+        inset 0 0 20px rgba(0, 255, 255, 0.3);                       /* Lueur plus concentrée */
     }
 
-    .board{background:#10223f;padding:16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    /* Apparence d’un bouton de taille désactivé (lors de la fin de partie) */
+    .colbtn:disabled {
+      opacity: .4;           /* Applique une transparence */
+      cursor: not-allowed;   /* Curseur interdit */
+      border-color: #666;    /* Bordure grisée */
+      color: #666;           /* Texte gris */
+      text-shadow: none;     /* Supprime la lueur */
+      box-shadow: none;      /* Supprime l'ombre */
+      transform: none;       /* Pas d'animation de déplacement */
+    }
 
-    .board-inner{display:grid;gap:var(--gap);padding:var(--pad);position:relative;margin:0 auto;
-      background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
-      background-size:var(--imgW) auto;background-repeat:no-repeat;background-position:calc(var(--offx) * -1) calc(var(--offy) * -1)}
+    /* ------------------------------------------------------------------
+       BLOC QUI CONTIENT LE PLATEAU (FOND RECTANGULAIRE)
+       ------------------------------------------------------------------ */
+    .board {
+      background: #10223f;                        /* Fond bleu nuit */
+      padding: 16px;                              /* Espacement autour du plateau interne */
+      border-radius: 14px;                        /* Coins arrondis */
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);     /* Ombre portée sous le plateau */
+    }
+
+    /* ------------------------------------------------------------------
+       PLATEAU CLASSIQUE AVEC IMAGE DE FOND (NON-NÉON)
+       ------------------------------------------------------------------ */
+    .board-inner {
+      display: grid;                              /* Affiche la grille de cellules */
+      gap: var(--gap);                            /* Utilise l’écart défini plus haut */
+      padding: var(--pad);                        /* Utilise le padding défini plus haut */
+      position: relative;                         /* Nécessaire pour certains effets */
+      margin: 0 auto;                             /* Centre la grille horizontalement */
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+      /* Image de fond minuscule (placeholder), remplacée par un vrai plateau dans un autre contexte si besoin */
+      background-size: var(--imgW) auto;          /* Adapte la taille de l'image de fond */
+      background-repeat: no-repeat;               /* Pas de répétition de l'image */
+      background-position: calc(var(--offx) * -1) calc(var(--offy) * -1); /* Positionne l'image via les offsets */
+    }
     
-    .cell{width:var(--cell);height:var(--cell);border-radius:50%;position:relative}
-    .cell button{
-      width:100%;
-      height:100%;
-      border:2px solid transparent;
-      background:transparent;
-      border-radius:50%;
-      cursor:pointer;
-      position:relative;
-      transition:all 0.3s ease;
-      overflow:hidden;
+    /* Une case d’emplacement potentielle pour un jeton (structure de base) */
+    .cell {
+      width: var(--cell);                         /* Diamètre de la cellule */
+      height: var(--cell);                        /* Diamètre de la cellule */
+      border-radius: 50%;                         /* Rend la cellule circulaire */
+      position: relative;                         /* Support pour ::before ou effets */
     }
-    .cell button:hover{
-      border-color:#00ccff;
+
+    /* Zone cliquable à l'intérieur de la cellule */
+    .cell button {
+      width: 100%;                                /* Remplit toute la cellule */
+      height: 100%;
+      border: 2px solid transparent;             /* Bordure invisible par défaut */
+      background: transparent;                    /* Transparence pour laisser voir la texture */
+      border-radius: 50%;                         /* Garder la forme ronde */
+      cursor: pointer;                            /* Main au survol */
+      position: relative;
+      transition: all 0.3s ease;                  /* Transition sur survol et clic */
+      overflow: hidden;                           /* Cache les débordements visuels */
+    }
+
+    /* Effet visuel lorsqu'on survole une cellule jouable */
+    .cell button:hover {
+      border-color: #00ccff;                      /* Bordure cyan */
       box-shadow:
         0 0 15px rgba(0, 204, 255, 0.6),
         0 0 30px rgba(0, 204, 255, 0.3),
-        inset 0 0 15px rgba(0, 204, 255, 0.1);
-      transform:scale(1.1);
+        inset 0 0 15px rgba(0, 204, 255, 0.1);    /* Effet lumineux autour de la cellule */
+      transform: scale(1.1);                      /* Légère augmentation de la taille */
     }
-    .cell button:active{
-      transform:scale(1.05);
+
+    /* Effet visuel lors du clic sur la cellule */
+    .cell button:active {
+      transform: scale(1.05);                     /* Retour partiel vers la taille normale */
       box-shadow:
         0 0 20px rgba(0, 204, 255, 0.8),
-        inset 0 0 20px rgba(0, 204, 255, 0.2);
+        inset 0 0 20px rgba(0, 204, 255, 0.2);    /* Lueur plus forte */
     }
-    .cell button:disabled{
-      cursor:not-allowed;
-      border-color:transparent;
-      box-shadow:none;
-      transform:none;
-    }
-    .cell.p1{background:url('/static/img/orange_token.png') center/contain no-repeat}
-    .cell.p2{background:url('/static/img/purple_token.png') center/contain no-repeat}
-    .cell.blocked{background:#666;border-radius:50%}
 
-    /* Contrôles de gravité */
-    .gravity-controls{display:flex;align-items:center;gap:10px;margin-left:20px;padding:8px 12px;background:#1a2844;border-radius:6px;border:1px solid #2d3f70}
-    .gravity-btn{
-      padding:6px 12px;
-      border:2px solid #00ff88;
-      background:linear-gradient(145deg, #152348, #1a2854);
-      color:#00ff88;
-      border-radius:4px;
-      cursor:pointer;
-      font-weight:600;
-      text-decoration:none;
-      font-size:12px;
-      position:relative;
-      overflow:hidden;
-      text-shadow:0 0 8px #00ff88;
+    /* Cellule désactivée (par exemple après fin de partie) */
+    .cell button:disabled {
+      cursor: not-allowed;                        /* Curseur interdit */
+      border-color: transparent;                  /* Bordure invisible */
+      box-shadow: none;                           /* Pas d'ombre */
+      transform: none;                            /* Pas d'animation */
+    }
+
+    /* Cellule occupée par le joueur 1 : affichage d’un jeton orange via image */
+    .cell.p1 {
+      background: url('/static/img/orange_token.png') center/contain no-repeat;
+    }
+
+    /* Cellule occupée par le joueur 2 : affichage d’un jeton violet via image */
+    .cell.p2 {
+      background: url('/static/img/purple_token.png') center/contain no-repeat;
+    }
+
+    /* Cellule marquée comme bloquée (utilisable pour debug ou autre logique) */
+    .cell.blocked {
+      background: #666;                           /* Remplissage gris */
+      border-radius: 50%;
+    }
+
+    /* Clone visuel de jeton utilisé pour l’animation de chute (JS) */
+    .token-clone {
+      border-radius: 50%;                         /* Forme ronde */
+      pointer-events: none;                       /* Ne bloque pas les clics durant l’animation */
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);    /* Ombre pour donner du relief */
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      will-change: transform;                     /* Optimisation pour les animations */
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
+
+    /* ------------------------------------------------------------------
+       CONTROLES DE GRAVITÉ (NORMALE / INVERSEE)
+       ------------------------------------------------------------------ */
+    .gravity-controls {
+      display: flex;                              /* Aligne les éléments sur une ligne */
+      align-items: center;                        /* Centre verticalement les éléments */
+      gap: 10px;                                  /* Distance entre les enfants */
+      margin-left: 20px;                          /* Décalage par rapport au bloc précédent */
+      padding: 8px 12px;                          /* Espacement interne */
+      background: #1a2844;                        /* Fond bleu foncé */
+      border-radius: 6px;                         /* Coins arrondis */
+      border: 1px solid #2d3f70;                  /* Fine bordure plus claire */
+    }
+
+    /* Bouton de changement de gravité (texte + style néon vert) */
+    .gravity-btn {
+      padding: 6px 12px;
+      border: 2px solid #00ff88;                  /* Bordure verte néon */
+      background: linear-gradient(145deg, #152348, #1a2854); /* Dégradé bleu foncé */
+      color: #00ff88;                             /* Texte vert néon */
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;                      /* Supprime le soulignement */
+      font-size: 12px;
+      position: relative;                         /* Nécessaire pour ::before */
+      overflow: hidden;                           /* Cache les effets débordants */
+      text-shadow: 0 0 8px #00ff88;               /* Lueur autour du texte */
       box-shadow:
         0 0 8px rgba(0, 255, 136, 0.5),
         inset 0 0 8px rgba(0, 255, 136, 0.1);
-      transition:all 0.3s ease;
+      transition: all 0.3s ease;
     }
-    .gravity-btn:hover{
-      border-color:#ffff00;
-      color:#ffff00;
-      text-shadow:0 0 12px #ffff00;
+
+    /* Effet de survol sur les boutons de gravité */
+    .gravity-btn:hover {
+      border-color: #ffff00;                      /* Bordure jaune */
+      color: #ffff00;                             /* Texte jaune */
+      text-shadow: 0 0 12px #ffff00;              /* Lueur plus intense */
       box-shadow:
         0 0 15px rgba(255, 255, 0, 0.7),
         0 0 30px rgba(255, 255, 0, 0.4),
         inset 0 0 12px rgba(255, 255, 0, 0.2);
-      transform:scale(1.05);
+      transform: scale(1.05);                     /* Léger agrandissement au survol */
     }
-    .gravity-btn.active{
-      border-color:#ff6600;
-      color:#ff6600;
-      background:linear-gradient(145deg, #2d1a00, #3d2400);
-      text-shadow:0 0 15px #ff6600;
+
+    /* Style visuel du bouton de gravité actuellement actif */
+    .gravity-btn.active {
+      border-color: #ff6600;                      /* Bordure orange */
+      color: #ff6600;                             /* Texte orange */
+      background: linear-gradient(145deg, #2d1a00, #3d2400);
+      text-shadow: 0 0 15px #ff6600;
       box-shadow:
         0 0 20px rgba(255, 102, 0, 0.8),
         0 0 40px rgba(255, 102, 0, 0.5),
         inset 0 0 15px rgba(255, 102, 0, 0.3);
     }
-    .gravity-indicator{font-size:11px;color:#a8dadc;font-weight:bold}
 
-    /* CSS Néon pour les plateaux */
+    /* Petit label texte dans le bloc de gravité */
+    .gravity-indicator {
+      font-size: 11px;
+      color: #a8dadc;
+      font-weight: bold;
+    }
+
+    /* ------------------------------------------------------------------
+       FOND ET ESPACE AUTOUR D'UN PLATEAU NÉON (PETITES, MOYENNES, GRANDES TAILLES)
+       ------------------------------------------------------------------ */
     .neon-board {
       background: radial-gradient(ellipse at center, #1a2854 0%, #0f1b3c 50%, #0a1429 100%);
       padding: 40px;
@@ -171,11 +296,11 @@
       min-height: 600px;
     }
 
+    /* ------------------------------------------------------------------
+       ANIMATIONS NÉON GLOBALES POUR LES BOUTONS
+       ------------------------------------------------------------------ */
 
-
-    /* ===== ANIMATIONS NÉON POUR BOUTONS ===== */
-    
-    /* Animation de pulsation néon */
+    /* Animation simple de pulsation d'une lueur néon */
     @keyframes neonPulse {
       0%, 100% {
         box-shadow: 
@@ -192,7 +317,7 @@
       }
     }
 
-    /* Animation de bordure néon qui tourne */
+    /* Animation pour faire tourner la couleur de bordure néon */
     @keyframes neonBorderRotate {
       0% {
         border-color: #00ffff;
@@ -216,7 +341,7 @@
       }
     }
 
-    /* Animation de lueur électrique */
+    /* Animation d'effet "électrique" (lueur qui change continuellement) */
     @keyframes electricGlow {
       0%, 100% {
         box-shadow: 
@@ -249,16 +374,17 @@
       }
     }
 
-    /* Classe pour activer l'animation électrique */
+    /* Classe utilitaire : applique le glow électrique sur les boutons de taille */
     .colbtn.electric {
       animation: electricGlow 2s infinite alternate;
     }
 
+    /* Classe utilitaire : applique le glow électrique sur les boutons de gravité */
     .gravity-btn.electric {
       animation: electricGlow 2.5s infinite alternate;
     }
 
-    /* Animation d'étincelles autour des boutons */
+    /* Animation d'étincelles tournantes autour d'un bouton */
     @keyframes buttonSparkles {
       0% {
         transform: rotate(0deg);
@@ -273,7 +399,7 @@
       }
     }
 
-    /* Effet d'étincelles sur les boutons */
+    /* Effet visuel complémentaire sur les boutons au survol (halo animé) */
     .colbtn::before, .gravity-btn::before {
       content: '';
       position: absolute;
@@ -293,9 +419,11 @@
       animation: buttonSparkles 1.5s linear infinite;
     }
 
-    /* ===== EFFET CONFETTIS DE VICTOIRE ===== */
-    
-    /* Animation de confettis */
+    /* ------------------------------------------------------------------
+       EFFETS DE CONFETTIS POUR FÊTER UNE VICTOIRE / MATCH NUL
+       ------------------------------------------------------------------ */
+
+    /* Animation verticale des confettis (descendent de haut en bas) */
     @keyframes confetti {
       0% {
         transform: translateY(-100vh) rotate(0deg);
@@ -307,52 +435,60 @@
       }
     }
 
+    /* Style de base d’un confetti (rectangle coloré) */
     .confetti {
-      position: fixed;
+      position: fixed;                 /* Fixe par rapport à la fenêtre, pas au document */
       width: 10px;
       height: 10px;
-      background: #f39c12;
-      top: -10px;
-      animation: confetti 3s linear forwards;
-      z-index: 1000;
-      border-radius: 3px;
+      background: #f39c12;            /* Couleur par défaut (orange) */
+      top: -10px;                     /* Départ juste au-dessus de la zone visible */
+      animation: confetti 3s linear forwards;   /* Applique l’animation de chute */
+      z-index: 1000;                  /* Au-dessus de tout le reste */
+      border-radius: 3px;             /* Légers bords arrondis */
     }
 
+    /* Variantes de confettis (odd : impairs) pour diversifier la taille et la couleur */
     .confetti:nth-child(odd) {
-      background: #e74c3c;
+      background: #e74c3c;            /* Rouge */
       width: 8px;
       height: 8px;
-      animation-duration: 2.5s;
+      animation-duration: 2.5s;       /* Animation un peu plus rapide */
     }
 
+    /* Variantes de confettis (even : pairs) */
     .confetti:nth-child(even) {
-      background: #3498db;
+      background: #3498db;            /* Bleu */
       width: 6px;
       height: 6px;
-      animation-duration: 3.5s;
+      animation-duration: 3.5s;       /* Animation un peu plus lente */
     }
 
+    /* Variation dorée de confetti */
     .confetti.confetti-gold {
       background: #f1c40f;
       width: 12px;
       height: 12px;
     }
 
+    /* Variation violette de confetti */
     .confetti.confetti-purple {
       background: #9b59b6;
       width: 7px;
       height: 7px;
     }
 
+    /* Variation verte de confetti */
     .confetti.confetti-green {
       background: #27ae60;
       width: 9px;
       height: 9px;
     }
 
-    /* ===== EFFET NÉON BLANC POUR LE JOUEUR GAGNANT ===== */
-    
-    /* Animation de lueur néon blanche */
+    /* ------------------------------------------------------------------
+       ANIMATIONS ET EFFETS POUR LE JOUEUR GAGNANT (LUEUR BLANCHE)
+       ------------------------------------------------------------------ */
+
+    /* Effet de lueur sur le texte du statut (victoire) */
     @keyframes whiteNeonGlow {
       0%, 100% {
         text-shadow: 
@@ -373,7 +509,7 @@
       }
     }
 
-    /* Animation de bordure néon blanche */
+    /* Effet de lueur sur la "box" de statut de victoire */
     @keyframes whiteNeonBorder {
       0%, 100% {
         box-shadow: 
@@ -392,7 +528,7 @@
       }
     }
 
-    /* Classes pour le joueur gagnant */
+    /* Style de texte pour le joueur gagnant (peut être appliqué sur le nom) */
     .winner-player {
       animation: whiteNeonGlow 1.5s ease-in-out infinite;
       color: #ffffff !important;
@@ -403,6 +539,7 @@
       border: 2px solid #ffffff;
     }
 
+    /* Style pour le bloc status en cas de victoire */
     .winner-status {
       animation: whiteNeonBorder 1.5s ease-in-out infinite;
       background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
@@ -411,7 +548,7 @@
       padding: 8px 12px;
     }
 
-    /* Effet néon sur les jetons du joueur gagnant */
+    /* Style pour les cellules contenant les jetons gagnants (lueur blanche) */
     .cell.winner-token {
       animation: whiteNeonBorder 1.2s ease-in-out infinite;
       transform: scale(1.1);
@@ -435,6 +572,154 @@
       animation: whiteNeonBorder 1s ease-in-out infinite;
       z-index: -1;
     }
+
+    /* ------------------------------------------------------------------
+       EFFETS POUR UN MATCH NUL (PLATEAU PLEIN)
+       ------------------------------------------------------------------ */
+
+    /* Lueur alternée sur le statut "match nul" */
+    @keyframes drawGlow {
+      0%, 100% {
+        text-shadow: 
+          0 0 5px #ffff00,
+          0 0 10px #ffff00,
+          0 0 15px #ffff00;
+        color: #ffff00;
+      }
+      50% {
+        text-shadow: 
+          0 0 10px #ff8c00,
+          0 0 20px #ff8c00,
+          0 0 30px #ff8c00;
+        color: #ff8c00;
+      }
+    }
+
+    /* Lueur sur les jetons en cas de match nul */
+    @keyframes drawTokenGlow {
+      0%, 100% {
+        box-shadow: 
+          0 0 8px #ffff00,
+          0 0 15px #ffff00;
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 
+          0 0 15px #ff8c00,
+          0 0 25px #ff8c00,
+          0 0 35px #ff8c00;
+        transform: scale(1.05);
+      }
+    }
+
+    /* Style du statut lorsqu'il s'agit d'un match nul */
+    .draw-status {
+      animation: drawGlow 2s ease-in-out infinite;
+      background: linear-gradient(45deg, rgba(255,255,0,0.1), rgba(255,140,0,0.1));
+      border: 2px solid #ffff00;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    /* Classe appliquée aux cellules possédant un jeton lors d'un match nul */
+    .cell.draw-token {
+      animation: drawTokenGlow 1.8s ease-in-out infinite;
+      z-index: 5;
+      position: relative;
+    }
+
+    .cell.draw-token::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 50%;
+      border: 2px solid #ffff00;
+      box-shadow: 
+        0 0 8px #ffff00,
+        0 0 15px #ffff00;
+      animation: drawTokenGlow 1.5s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    /* ------------------------------------------------------------------
+       POPUP DE MESSAGE "MATCH NUL"
+       ------------------------------------------------------------------ */
+
+    /* Animation d'apparition (scale + petite rotation) pour le message de match nul */
+    @keyframes drawMessageBounce {
+      0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.2) rotate(5deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    /* Animation de lueur autour du message de match nul */
+    @keyframes drawMessageGlow {
+      0%, 100% {
+        text-shadow: 
+          0 0 10px #ffff00,
+          0 0 20px #ffff00,
+          0 0 30px #ffff00;
+        box-shadow: 
+          0 0 15px rgba(255, 255, 0, 0.5),
+          0 0 30px rgba(255, 255, 0, 0.3);
+      }
+      50% {
+        text-shadow: 
+          0 0 15px #ff8c00,
+          0 0 30px #ff8c00,
+          0 0 45px #ff8c00;
+        box-shadow: 
+          0 0 25px rgba(255, 140, 0, 0.7),
+          0 0 50px rgba(255, 140, 0, 0.4);
+      }
+    }
+
+    /* Fenêtre centrale du message "match nul" (superposée au plateau) */
+    .draw-message {
+      position: fixed;           /* Reste centrée même si on scrolle (si la page avait un scroll) */
+      top: 50%;                  /* Centre verticalement */
+      left: 50%;                 /* Centre horizontalement */
+      transform: translate(-50%, -50%);
+      background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+      color: #ffff00;
+      font-size: 36px;
+      font-weight: bold;
+      padding: 20px 40px;
+      border: 4px solid #ffff00;
+      border-radius: 15px;
+      z-index: 10000;            /* Au-dessus des confettis */
+      text-align: center;
+      animation:
+        drawMessageBounce 0.8s ease-out,
+        drawMessageGlow 2s ease-in-out infinite 0.8s;
+      box-shadow: 
+        0 0 20px rgba(255, 255, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 0, 0.1);
+    }
+
+    /* Emoji dans la popup "match nul" (juste décoratif) */
+    .draw-message .draw-emoji {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 10px;
+      animation: drawMessageBounce 1s ease-out 0.3s;
+    }
+
+    /* ------------------------------------------------------------------
+       STYLES NÉON POUR LE PLATEAU "SMALL" (RAPPEL DE board_small)
+       ------------------------------------------------------------------ */
 
     .board-frame-neon {
       background: rgba(8, 18, 45, 0.95);
@@ -597,116 +882,147 @@
       border: 2px solid #00b4ff;
       border-top: none;
     }
-=======
-    .status strong{color:#ffd166}
-
-    .board{background:#10223f;padding:16px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
->>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
   </style>
 </head>
 <body>
+  <!--
+    .wrap : bloc principal qui contient à la fois la barre de statut (tour, gravité, etc.)
+    et le plateau de jeu (rendu via un des templates : board_small / board_medium / board_large)
+  -->
   <div class="wrap">
-<<<<<<< HEAD
+    <!--
+      .status : partie supérieure de la page.
+      Contient :
+        - Message "Tour du joueur X" ou "Victoire", etc.
+        - Chronomètre
+        - Lien Reset
+        - Contrôle de gravité
+        - Boutons de changement de taille
+    -->
     <div class="status">
       {{if eq .Winner 0}}
+        <!-- Cas où la partie est en cours : aucun gagnant -->
         <span>Tour du joueur {{.CurrentPlayer}}</span>
+        <!-- Chronomètre du tour (10 secondes par joueur) mis à jour par timer.js -->
+        <span id="turn-timer" style="margin-left:12px;color:#ffd166;font-weight:700;">
+          Temps restant: <span id="time-left">10</span>s
+        </span>
+      {{else if eq .Winner -1}}
+        <!-- Cas match nul (plateau plein sans alignement gagnant) -->
+        <span>🤝 Match nul ! Plateau plein</span>
       {{else}}
-        <span>🎉 Joueur {{.Winner}} a gagné !</span>
+        <!-- Cas où un joueur a gagné (Winner vaut 1 ou 2) -->
+        <span>🎉 Victoire du joueur {{.Winner}} !</span>
       {{end}}
 
+      <!-- Lien pour réinitialiser la même partie (même taille de plateau, même gravité) -->
       <a class="link" href="/reset">Reset</a>
 
-      <!-- Contrôles de gravité -->
+      <!--
+        Bloc des contrôles de gravité :
+        - Gravité "Normale" : les jetons tombent vers le bas (inverted=false)
+        - Gravité "Inversée" : les jetons tombent vers le haut (inverted=true)
+        Le style "active" est appliqué au bouton correspondant à l'état actuel.
+      -->
       <div class="gravity-controls">
         <span class="gravity-indicator">Gravité:</span>
-        <a href="/gravity?inverted=false" class="gravity-btn {{if not .InvertedGravity}}active{{end}}">
+
+        <!-- Bouton pour activer la gravité normale (inverted=false) -->
+        <a href="/gravity?inverted=false"
+           class="gravity-btn {{if not .InvertedGravity}}active{{end}}">
           ⬇️ Normale
         </a>
-        <a href="/gravity?inverted=true" class="gravity-btn {{if .InvertedGravity}}active{{end}}">
+
+        <!-- Bouton pour activer la gravité inversée (inverted=true) -->
+        <a href="/gravity?inverted=true"
+           class="gravity-btn {{if .InvertedGravity}}active{{end}}">
           ⬆️ Inversée
         </a>
+
+        <!-- Message d'information supplémentaire lorsque la gravité est inversée -->
         {{if .InvertedGravity}}
           <span class="gravity-indicator">Jetons tombent vers le HAUT!</span>
         {{end}}
       </div>
 
+      <!--
+        Formulaire GET pour choisir une nouvelle taille de plateau.
+        size=small  → plateau 6x7
+        size=medium → plateau 6x9
+        size=large  → plateau 7x8
+        On conserve le flag debug dans l'URL si .Debug est vrai.
+      -->
       <form action="/new" method="get" class="sizes">
+        <!-- Si le mode debug est activé, on retransmet le paramètre -->
         {{if .Debug}}<input type="hidden" name="debug" value="1">{{end}}
+
+        <!-- Bouton pour relancer une partie en "small" (facile) -->
         <button class="colbtn" type="submit" name="size" value="small">Small</button>
+
+        <!-- Bouton pour relancer une partie en "medium" (normal) -->
         <button class="colbtn" type="submit" name="size" value="medium">Medium</button>
+
+        <!-- Bouton pour relancer une partie en "large" (difficile/pro) -->
         <button class="colbtn" type="submit" name="size" value="large">Large</button>
       </form>
     </div>
 
+    <!--
+      Conteneur graphique du plateau :
+      On va rendre ici un sous-template selon la valeur .BoardTemplate
+      - "board_small"  → plateau néon small (6x7)
+      - "board_medium" → plateau néon medium (6x9)
+      - "board_large"  → plateau néon large (7x8)
+    -->
     <div class="board">
       {{if eq .BoardTemplate "board_small"}}
+        <!-- Utilisation du template Go "board_small" -->
         {{template "board_small" .}}
       {{else if eq .BoardTemplate "board_large"}}
+        <!-- Utilisation du template Go "board_large" -->
         {{template "board_large" .}}
       {{else}}
+        <!-- Cas par défaut : "board_medium" -->
         {{template "board_medium" .}}
       {{end}}
     </div>
-=======
-
-    <!-- NAV vers PHP + tailles + reset -->
-    <div class="nav">
-      <a href="{{.PHPBase}}/index.php">⬅️ Retour au menu</a>
-      {{if .Username}}
-        <a href="{{.PHPBase}}/profile.php">👤 Profil ({{.Username}})</a>
-      {{else}}
-        <a href="{{.PHPBase}}/register.php">Se connecter / Créer un compte</a>
-      {{end}}
-      <a href="/reset">🔁 Réinitialiser</a>
-      <a href="/new?size=small">🟡 Small</a>
-      <a href="/new?size=medium">🟠 Medium</a>
-      <a href="/new?size=large">🔵 Large</a>
-    </div>
-
-    <!-- Statut -->
-    <div class="status">
-      {{if eq .Winner 0}}
-        Tour du joueur <strong>{{.CurrentPlayer}}</strong>
-      {{else if eq .Winner -1}}
-        <strong>Égalité</strong>
-      {{else}}
-        🎉 Joueur <strong>{{.Winner}}</strong> gagne !
-      {{end}}
-    </div>
-
-    <!-- Plateau -->
-    <div class="board">
-      {{if eq .BoardTemplate "board_small"}}
-        {{template "board_small" .}}
-      {{else if eq .BoardTemplate "board_large"}}
-        {{template "board_large" .}}
-      {{else}}
-        {{template "board_medium" .}}
-      {{end}}
-    </div>
-
->>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
   </div>
 
   <script>
-    // Fonction pour créer des confettis
+
+    // createConfetti : crée un ensemble de confettis animés sur l'écran
     function createConfetti() {
-      const colors = ['#f39c12', '#e74c3c', '#3498db', '#f1c40f', '#9b59b6', '#27ae60', '#e67e22', '#2ecc71'];
+      // Palette de couleurs utilisée pour colorer les confettis
+      const colors = [
+        '#f39c12', '#e74c3c', '#3498db',
+        '#f1c40f', '#9b59b6', '#27ae60',
+        '#e67e22', '#2ecc71'
+      ];
+
+      // Classes supplémentaires pour varier la forme/taille de certains confettis
       const confettiClasses = ['', 'confetti-gold', 'confetti-purple', 'confetti-green'];
       
+      // On génère 80 confettis avec un léger décalage de temps
       for (let i = 0; i < 80; i++) {
         setTimeout(() => {
+          // Création du div qui représente un confetti individuel
           const confetti = document.createElement('div');
+          // Sélection d'une classe supplémentaire au hasard (ou chaîne vide)
           const extraClass = confettiClasses[Math.floor(Math.random() * confettiClasses.length)];
           
+          // Application de la classe de base "confetti" + éventuelle classe extra
           confetti.className = `confetti ${extraClass}`;
+          // Position horizontale aléatoire (entre 0vw et 100vw)
           confetti.style.left = Math.random() * 100 + 'vw';
+          // Couleur de fond aléatoire dans la palette
           confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          // Décalage d'animation léger pour ne pas tout lancer en même temps
           confetti.style.animationDelay = Math.random() * 1 + 's';
           
+          // Ajout du confetti dans le document
           document.body.appendChild(confetti);
           
-          // Supprimer le confetti après l'animation
+          // Nettoyage après la fin de l'animation (3 à 4 secondes)
           setTimeout(() => {
             if (confetti.parentNode) {
               confetti.remove();
@@ -716,116 +1032,251 @@
       }
     }
 
-    // Variables globales pour la détection
+    // Variables globales pour la détection d'état de fin de partie
+
+    // lastStatusText : mémorise le dernier texte affiché dans la barre de statut
     let lastStatusText = '';
+    // confettiTriggered : indique si les confettis ont déjà été lancés pour cette fin de partie
     let confettiTriggered = false;
+    // winnerEffectActive : indique si l'effet néon blanc de victoire est en cours
     let winnerEffectActive = false;
 
-    // Fonction pour appliquer l'effet néon blanc au joueur gagnant
+  
+    // applyWinnerNeonEffect : applique un effet visuel au joueur gagnant
+    // statusText : texte complet de la barre de statut au moment de la victoire
+ 
     function applyWinnerNeonEffect(statusText) {
+      // Récupère la div .status qui contient le texte principal
       const status = document.querySelector('.status');
       if (!status) return;
       
-      // Détecter quel joueur a gagné
+      // Détermination du joueur gagnant (1 ou 2) en se basant sur le texte
       let winningPlayer = null;
-      if (statusText.includes('joueur 1') || statusText.includes('player 1') || statusText.includes('p1')) {
+      let playerName = '';
+
+      // On cherche la mention "joueur 1" / "player 1" / "p1"
+      if (
+        statusText.includes('joueur 1') ||
+        statusText.includes('player 1') ||
+        statusText.includes('p1')
+      ) {
         winningPlayer = 1;
-      } else if (statusText.includes('joueur 2') || statusText.includes('player 2') || statusText.includes('p2')) {
+        playerName = 'Joueur 1';
+      }
+      // On cherche la mention "joueur 2" / "player 2" / "p2"
+      else if (
+        statusText.includes('joueur 2') ||
+        statusText.includes('player 2') ||
+        statusText.includes('p2')
+      ) {
         winningPlayer = 2;
+        playerName = 'Joueur 2';
       }
       
-      // Appliquer l'effet néon au message de statut
+      // Ajoute une classe sur la barre de statut pour activer le cadre néon blanc
       status.classList.add('winner-status');
       
-      // Appliquer l'effet néon aux jetons du joueur gagnant
+      // Si on a identifié un joueur gagnant, on affiche une popup et on marque ses jetons
       if (winningPlayer) {
-        const winnerTokens = document.querySelectorAll(`.cell.p${winningPlayer}`);
+        // Création de la popup de victoire (fenêtre superposée)
+        const winMessage = document.createElement('div');
+        winMessage.className = 'draw-message';
+        // Adaptation de la couleur de texte/bordure en blanc pour la victoire
+        winMessage.style.color = '#ffffff';
+        winMessage.style.borderColor = '#ffffff';
+        winMessage.innerHTML = `
+          <span class="draw-emoji">🏆</span>
+          <div>${playerName} GAGNE !</div>
+          <div style="font-size: 18px; margin-top: 10px;">Félicitations !</div>
+        `;
+        document.body.appendChild(winMessage);
+        
+        // Sélection de toutes les cellules de la classe .cell.p1 ou .cell.p2
+        const winnerTokens = document.querySelectorAll(\`.cell.p\${winningPlayer}\`);
+        // Ajoute la classe "winner-token" à chaque jeton du joueur gagnant
         winnerTokens.forEach(token => {
           token.classList.add('winner-token');
         });
-        console.log(`✨ Effet néon blanc appliqué au joueur ${winningPlayer}`);
+        console.log(`Effet néon appliqué au ${playerName}`);
+        
+        // Nettoyage automatique après un certain délai (8 secondes)
+        setTimeout(() => {
+          // Retire la classe principale sur la barre de statut
+          status.classList.remove('winner-status');
+          // Retire la classe de glow sur les jetons
+          document.querySelectorAll('.winner-token').forEach(token => {
+            token.classList.remove('winner-token');
+          });
+          // Retire la popup si elle est toujours présente
+          if (winMessage.parentNode) {
+            winMessage.remove();
+          }
+          winnerEffectActive = false;
+          console.log('Effets de victoire retirés');
+        }, 8000);
       }
-      
-      // Retirer les effets après 8 secondes
-      setTimeout(() => {
-        status.classList.remove('winner-status');
-        document.querySelectorAll('.winner-token').forEach(token => {
-          token.classList.remove('winner-token');
-        });
-        winnerEffectActive = false;
-        console.log('🔄 Effets néon retirés');
-      }, 8000);
     }
 
-    // Fonction améliorée pour détecter une victoire
+    // -------------------------------------------------------------------
+    // applyDrawEffect : applique un effet visuel spécial en cas de match nul
+    // statusText : texte complet de la barre de statut au moment du nul
+    // -------------------------------------------------------------------
+    function applyDrawEffect(statusText) {
+      // Récupère la barre de statut
+      const status = document.querySelector('.status');
+      if (!status) return;
+      
+      // Applique une classe spéciale "draw-status" pour transformer l'apparence du statut
+      status.classList.add('draw-status');
+      
+      // Création d'une popup centrale indiquant "MATCH NUL"
+      const drawMessage = document.createElement('div');
+      drawMessage.className = 'draw-message';
+      drawMessage.innerHTML = `
+        <span class="draw-emoji">🤝</span>
+        <div>MATCH NUL !</div>
+        <div style="font-size: 18px; margin-top: 10px;">Égalité parfaite</div>
+      `;
+      document.body.appendChild(drawMessage);
+      
+      // Récupère tous les jetons présents sur le plateau (p1 et p2)
+      const allTokens = document.querySelectorAll('.cell.p1, .cell.p2');
+      // Applique la classe "draw-token" progressivement (effet de cascade)
+      allTokens.forEach((token, index) => {
+        setTimeout(() => {
+          token.classList.add('draw-token');
+        }, index * 100);
+      });
+      
+      console.log('Effet de match nul appliqué');
+      
+      // Nettoyage des effets après 6 secondes
+      setTimeout(() => {
+        status.classList.remove('draw-status');
+        document.querySelectorAll('.draw-token').forEach(token => {
+          token.classList.remove('draw-token');
+        });
+        if (drawMessage.parentNode) {
+          drawMessage.remove();
+        }
+        console.log('Effets de match nul retirés');
+      }, 6000);
+    }
+
+    // -------------------------------------------------------------------
+    // detectVictory : surveille le texte de la barre de statut pour
+    // déterminer s'il y a une victoire ou un match nul.
+    // Retourne un booléen (true si fin de partie détectée).
+    // -------------------------------------------------------------------
     function detectVictory() {
+      // On récupère une référence vers l'élément .status
       const status = document.querySelector('.status');
       if (!status) return false;
       
+      // On récupère le texte de .status et on met en minuscule pour simplifier la comparaison
       const currentText = status.textContent.toLowerCase();
       
-      // Détecter différents messages de victoire possibles
+      // Liste de mots-clés pouvant apparaître en cas de victoire
       const victoryKeywords = ['gagne', 'victoire', 'winner', 'win', 'gagné', 'remporte'];
-      const hasVictoryKeyword = victoryKeywords.some(keyword => currentText.includes(keyword));
+      // Liste de mots-clés pouvant apparaître en cas de match nul
+      const drawKeywords = ['match nul', 'égalité', 'draw', 'tie', 'nul', 'egalité'];
       
-      // Vérifier si le texte a changé et contient un mot-clé de victoire
-      if (currentText !== lastStatusText && hasVictoryKeyword && !confettiTriggered) {
-        console.log('🎉 VICTOIRE DÉTECTÉE ! Déclenchement des confettis et effet néon...');
-        confettiTriggered = true;
-        winnerEffectActive = true;
+      // Vérifie si le texte contient un mot de victoire
+      const hasVictoryKeyword = victoryKeywords.some(keyword => currentText.includes(keyword));
+      // Vérifie si le texte contient un mot de match nul
+      const hasDrawKeyword = drawKeywords.some(keyword => currentText.includes(keyword));
+      
+      // On ne déclenche l'effet que si :
+      // - le texte a changé depuis la dernière vérification
+      // - le texte contient un des mots-clés de fin de partie
+      // - les confettis n'ont pas encore été déclenchés
+      if (currentText !== lastStatusText && (hasVictoryKeyword || hasDrawKeyword) && !confettiTriggered) {
         
-        // Déclencher les confettis
-        createConfetti();
+        if (hasDrawKeyword) {
+          // Cas match nul
+          console.log('Match nul détecté, lancement effets et confettis');
+          confettiTriggered = true;
+          
+          // Confettis + effet de match nul
+          createConfetti();
+          applyDrawEffect(currentText);
+          
+        } else if (hasVictoryKeyword) {
+          // Cas victoire
+          console.log('Victoire détectée, lancement effets et confettis');
+          confettiTriggered = true;
+          winnerEffectActive = true;
+          
+          // Confettis + effet de victoire
+          createConfetti();
+          applyWinnerNeonEffect(currentText);
+        }
         
-        // Appliquer l'effet néon blanc au joueur gagnant
-        applyWinnerNeonEffect(currentText);
-        
-        // Réinitialiser après 5 secondes pour permettre une nouvelle partie
+        // Après 5 secondes, on permet à nouveau la détection d'une nouvelle fin de partie
         setTimeout(() => {
           confettiTriggered = false;
-          console.log('✅ Prêt pour une nouvelle détection de victoire');
+          console.log('Réinitialisation du détecteur de fin de partie');
         }, 5000);
       }
       
+      // On met à jour le dernier texte connu pour la prochaine comparaison
       lastStatusText = currentText;
     }
 
-    // Observer les changements de DOM pour une détection plus réactive
+    // -------------------------------------------------------------------
+    // setupVictoryObserver : installe un MutationObserver sur .status
+    // pour détecter en temps réel les changements de texte/statut.
+    // -------------------------------------------------------------------
     function setupVictoryObserver() {
+      // Récupère l'élément .status (barre supérieure)
       const statusElement = document.querySelector('.status');
       if (statusElement) {
-        // Observer les changements de contenu
+        // Création du MutationObserver avec une fonction callback
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
+            // On s'intéresse aux modifications du contenu texte ou des enfants
             if (mutation.type === 'childList' || mutation.type === 'characterData') {
               detectVictory();
             }
           });
         });
         
+        // Lancement de l'observation sur .status
         observer.observe(statusElement, {
-          childList: true,
-          subtree: true,
-          characterData: true
+          childList: true,       // Observe l'ajout ou la suppression d'enfants
+          subtree: true,         // Inclut les nœuds internes
+          characterData: true    // Observe les changements de texte
         });
         
-        console.log('🔍 Observateur de victoire activé');
+        console.log('Observateur de victoire activé');
       }
     }
 
-    // Surveillance par intervalle comme solution de secours
+    // Filet de sécurité : vérifie la fin de partie régulièrement si jamais le MutationObserver
+    // ne capture pas un changement (par exemple à cause d'une modification indirecte).
     setInterval(detectVictory, 200);
 
-
-
-    // Initialisation au chargement de la page
+    // Initialisation globale au chargement de la page
     document.addEventListener('DOMContentLoaded', () => {
-      // Activer l'observateur de victoire
+      // Installe le MutationObserver sur la zone de statut
       setupVictoryObserver();
-      
-      console.log('🚀 Système de confettis initialisé');
+      console.log('Système de confettis et de détection de fin de partie initialisé');
     });
   </script>
+
+  <!--
+    Script physics.js :
+    - Gère l'animation de chute des jetons (calcul de trajectoire)
+    - Intercepte les clics sur les boutons de colonnes pour déclencher l'animation
+  -->
+  <script src="/static/js/physics.js"></script>
+
+  <!--
+    Script timer.js :
+    - Met en place le compte à rebours de 10 secondes par tour
+    - En cas de timeout, appelle l’endpoint /random_move (coup automatique)
+  -->
+  <script src="/static/js/timer.js"></script>
 
 </body>
 </html>

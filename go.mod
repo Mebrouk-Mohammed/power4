@@ -4,11 +4,7 @@ go 1.23.0
 
 require modernc.org/sqlite v1.39.0
 
-// 👉 clé magique : dit à Go que le module 'powerfour/power4' pointe sur ce dossier.
-replace powerfour/power4 => .
-
 require (
-<<<<<<< HEAD
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -19,8 +15,4 @@ require (
 	modernc.org/libc v1.66.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-=======
-	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/go-sql-driver/mysql v1.9.3 // indirect
->>>>>>> bda513fd2bb1669761e3605ed8a5539f7056ce17
 )
