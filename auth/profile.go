@@ -12,15 +12,18 @@ import (
 
 // ProfileData est passé au template profile.gohtml
 type ProfileData struct {
-	Username    string
-	Email       string
-	Avatar      string
-	ELO         int
-	Rank        string
-	GamesPlayed int
-	Wins        int
-	Losses      int
-	Draws       int
+	Username     string
+	Email        string
+	Avatar       string
+	ELO          int
+	Rank         string
+	RankMin      int // ELO minimum du rang actuel
+	RankMax      int // ELO nécessaire pour passer au rang suivant
+	RankProgress int // Progression (0–100) vers le rang suivant
+	GamesPlayed  int
+	Wins         int
+	Losses       int
+	Draws        int
 }
 
 // ProfileHandler : affiche le profil du joueur connecté
@@ -51,7 +54,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Si on a un MySQLRepo, on essaie de récupérer le rating + quelques stats
+		// Si on a un mysqlRepo, on essaie de récupérer le rating + quelques stats
 		if mr, ok := repo.(*mysqlRepo); ok {
 			userID := dataFromUserID(repo, username)
 
@@ -92,8 +95,10 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Calcul du rang en fonction de l’ELO
+	// Calcul du rang + progression
 	data.Rank = RankFromELO(data.ELO)
+	data.RankMin, data.RankMax = RankBounds(data.ELO)
+	data.RankProgress = RankProgress(data.ELO)
 
 	if err := tpl.ExecuteTemplate(w, "profile.gohtml", data); err != nil {
 		log.Printf("profile: template error for '%s': %v", username, err)
@@ -165,7 +170,7 @@ func LeaderboardHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Si pas de DB ou problème → fallback en faux leaderboard (comme avant)
+	// Pas de DB ou erreur → faux leaderboard
 	if len(data.Players) == 0 {
 		for i := 1; i <= 8; i++ {
 			name := "Joueur" + strconv.Itoa(i)
@@ -250,4 +255,37 @@ func RankFromELO(elo int) string {
 	default:
 		return "Master"
 	}
+}
+
+// RankBounds : retourne la plage ELO du rang actuel (min, max pour passer rang suivant)
+func RankBounds(elo int) (min int, max int) {
+	switch {
+	case elo < 1000: // Bronze
+		return 0, 1000
+	case elo < 1300: // Silver
+		return 1000, 1300
+	case elo < 1600: // Gold
+		return 1300, 1600
+	case elo < 1900: // Platine
+		return 1600, 1900
+	case elo < 2200: // Diamant
+		return 1900, 2200
+	default: // Master : on fixe une plage arbitraire 2200–2600
+		return 2200, 2600
+	}
+}
+
+// RankProgress : progression en % dans le rang actuel vers le prochain rang
+func RankProgress(elo int) int {
+	min, max := RankBounds(elo)
+	if max <= min {
+		return 100
+	}
+	if elo < min {
+		elo = min
+	}
+	if elo > max {
+		elo = max
+	}
+	return (elo - min) * 100 / (max - min)
 }
